@@ -48,7 +48,7 @@ jobs:
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
         git add .
-        PLUGIN_VERSION=$(grep -oP "(?<=te-custom-mods: )[0-9]+\.[0-9]+\.[0-9]+" ./prod-versions.ini)
+        PLUGIN_VERSION=$(grep -oP "(?<=st-peter-custom-mods: )[0-9]+\.[0-9]+\.[0-9]+" ./prod-versions.ini)
         git commit -m "GHA_BUILD: Increment Plugin Version to $PLUGIN_VERSION"
         git push origin ${{ github.event.pull_request.head.ref }}
     - name: Zip Plugin
@@ -71,7 +71,7 @@ jobs:
         RELEASE_BODY="""$PR_BODY
 
         $PR_URL"""
-        RELEASE_TAG=$(grep -oP "(?<=te-custom-mods: )[0-9]+\.[0-9]+\.[0-9]+" ./prod-versions.ini)
+        RELEASE_TAG=$(grep -oP "(?<=st-peter-custom-mods: )[0-9]+\.[0-9]+\.[0-9]+" ./prod-versions.ini)
         RELEASE_TITLE="$RELEASE_TAG: ${{ github.event.pull_request.title }}"
         gh release create "$RELEASE_TAG" --title "$RELEASE_TITLE" --notes "$RELEASE_BODY" --target $RELEASE_BRANCH -d
-        gh release upload "$RELEASE_TAG" ./te-custom-mods.zip
+        gh release upload "$RELEASE_TAG" ./st-peter-custom-mods.zip

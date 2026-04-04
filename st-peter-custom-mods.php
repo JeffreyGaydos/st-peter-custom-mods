@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: St. Peter Custom Mods
-Version: 0.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/te-custom-mods
+Version: 0.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
 
 Description: A plugin created for St. Peter Parish for any and all customizations that could be easily implemented in a plugin
 */
@@ -35,7 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.0');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.1');
 }
 
 //Creates the html of the plugin's setting page, passing data through the backend as needed
