@@ -18,3 +18,8 @@
 2026-04-04 01:36:19.877638 [build_update_plugin_version.py]: [INFO] Updating README.md...
 2026-04-04 01:36:19.878094 [build_update_plugin_version.py]: [INFO] Updating st-peter-custom-mods.php...
 2026-04-04 01:36:19.878383 [build_update_plugin_version.py]: Completed successfully
+2026-04-04 01:36:20.504479 [build_zip_plugin.py]: st-peter-custom-mods.php
+2026-04-04 01:36:20.506213 [build_zip_plugin.py]: spc-functions.php
+2026-04-04 01:36:20.506444 [build_zip_plugin.py]: spc_admin_panel.js
+2026-04-04 01:36:20.506551 [build_zip_plugin.py]: spc_masstimes.js
+2026-04-04 01:36:20.506648 [build_zip_plugin.py]: spc_init.js
