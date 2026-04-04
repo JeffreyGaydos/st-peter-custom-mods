@@ -34,7 +34,7 @@ regInclude = ["(?<!\.orig)\.js$", "(?<!\.orig)\.css$", "(?<!\.orig)\.png$", "(?<
 fileExclude = ["additional.css"]
 
 def zip_files(directory):
-    with zipfile.ZipFile('sp-custom-mods.zip', 'w') as zipf:
+    with zipfile.ZipFile('st-peter-custom-mods.zip', 'w') as zipf:
         for root, _, files in os.walk(directory):
             for file in files:
                 if fileExclude.__contains__(file):
