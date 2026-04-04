@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: St. Peter Custom Mods
-Version: 0.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/te-custom-mods
+Version: 0.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
 
 Description: A plugin created for St. Peter Parish for any and all customizations that could be easily implemented in a plugin
 */
