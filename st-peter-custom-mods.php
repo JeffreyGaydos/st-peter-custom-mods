@@ -35,7 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.0');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.1');
 }
 
 //Creates the html of the plugin's setting page, passing data through the backend as needed

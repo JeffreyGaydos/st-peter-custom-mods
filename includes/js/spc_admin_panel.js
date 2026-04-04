@@ -1,0 +1,1 @@
+console.log("spc_admin_panel.js");
