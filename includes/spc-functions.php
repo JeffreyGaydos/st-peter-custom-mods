@@ -26,3 +26,16 @@ if( !function_exists("spc_masstimes") ) {
         wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.1');
     }
 }
+
+/********************************************************************
+ * Routing Slider UI
+ ********************************************************************/
+if(get_option('spc_slider') == 'on') {
+    add_action("wp_head", "spc_slider", 10);
+}
+
+if( !function_exists("spc_slider") ) {
+    function spc_slider() {
+        wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.77');
+    }
+}

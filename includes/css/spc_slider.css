@@ -1,0 +1,39 @@
+#sp-slider {
+    overflow: hidden;
+    position: relative; /*So that the text box can be position absolute and ignore the image width if it's big*/
+
+    .sp-slide {
+        img {
+            height: 400px;
+        }
+    }
+    .sp-slide[data-active="false"] {
+        display: none;
+    }
+
+    .sp-slide-text-box {
+        width: 65%;
+        height: 400px;
+        display: inline-block;        
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: white;
+        box-shadow: -2px 0px 4px rgba(0, 0, 0, 0.3);
+        z-index: 0;
+        padding: 4dvw;
+    }
+
+    .sp-slide-date {
+        font-style: italic;
+        color: dimgray;
+    }
+
+    .sp-slide-excerpt {
+        color: black;
+    }
+}
+
+#sp-slider.hidden-until-js {
+    opacity: 1;
+}
