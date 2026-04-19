@@ -1,0 +1,14 @@
+td {
+    border: 1px solid black;
+    padding-inline: 30px;
+    margin: 0;
+}
+
+td#s {
+    color: green;
+}
+
+td#p {
+    background-color: orange;
+    font-weight: 600;
+}
