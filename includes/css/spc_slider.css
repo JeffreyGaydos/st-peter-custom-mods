@@ -54,7 +54,7 @@
     }
 
     .arrow {
-        bottom: 20px;
+        bottom: -10px /*20px*/; /*now that these are buttons, we need -10px for some reason...*/
         position: absolute;
         font: normal 26px / 1 'Genericons';
         vertical-align: top;
@@ -64,7 +64,8 @@
         border-radius: 3px;
         padding: 6px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease;
+        z-index: 1;
     }
 
     .arrow::before {
@@ -95,7 +96,8 @@
         text-align: center;
         width: 100%;
         height: var(--indicator-size);
-        bottom: 20px;
+        bottom: 28px;
+        z-index: 0;
 
         .indicator {
             display: inline-block;
@@ -103,8 +105,10 @@
             height: var(--indicator-size);
             border: 5px solid var(--sp-brown);
             border-radius: var(--indicator-size);
-            margin-inline: 5px;
+            margin-inline: min(1dvw, 5px);
             cursor: pointer;
+            padding: 0;
+            background-color: unset;
         }
 
         .indicator[data-active="true"] {

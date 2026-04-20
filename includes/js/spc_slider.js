@@ -79,7 +79,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.84";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.91";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -98,7 +98,7 @@
     }
 
     function constructSliderArrow(left, parent) {
-        const arrow = document.createElement("DIV");
+        const arrow = document.createElement("BUTTON");
         arrow.classList.add("arrow");
         arrow.classList.add(left ? "left" : "right");
         arrow.addEventListener("click",
@@ -114,7 +114,7 @@
             const container = document.createElement("DIV");
             container.classList.add("indicators");
             for(let i = 0; i < numSlides; i++) {
-                const indicator = document.createElement("DIV");
+                const indicator = document.createElement("BUTTON");
                 indicator.classList.add("indicator");
                 indicator.setAttribute("data-active", i === 0);
                 indicator.addEventListener("click", () => {
