@@ -79,7 +79,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.33";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.84";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -90,43 +90,127 @@
     let sp_slider_interval = undefined;
 
     function constructSliderControls() {
-        //TODO
-        console.log("UNIMPLEMENTED");
+        const parent = document.querySelector("#sp-slider");
+
+        const leftArrow = constructSliderArrow(true, parent);
+        const rightArrow = constructSliderArrow(false, parent);
+        const positionIndicators = constructIndicators(parent);
+    }
+
+    function constructSliderArrow(left, parent) {
+        const arrow = document.createElement("DIV");
+        arrow.classList.add("arrow");
+        arrow.classList.add(left ? "left" : "right");
+        arrow.addEventListener("click",
+            left
+                ? () => { previousSlide(true); }
+                : () => { nextSlide(true); }
+        );
+        parent.appendChild(arrow);
+    }
+
+    function constructIndicators(parent) {
+        if(numSlides) {
+            const container = document.createElement("DIV");
+            container.classList.add("indicators");
+            for(let i = 0; i < numSlides; i++) {
+                const indicator = document.createElement("DIV");
+                indicator.classList.add("indicator");
+                indicator.setAttribute("data-active", i === 0);
+                indicator.addEventListener("click", () => {
+                    jumpToSlide(i);
+                });
+                container.appendChild(indicator);
+            }
+            parent.appendChild(container);
+        }
     }
 
     function startSliderAutoPlay() {
         sp_slider_interval = setInterval(() => {
-            console.log("AUTOPLAYED");
             nextSlide();
-        }, 5000);
+        }, 10000);
     }
 
     function stopSliderAutoPlay() {
         clearInterval(sp_slider_interval);
+        sp_slider_interval = undefined;
     }
 
     function getCurrentSlideSelector() {
         return `#sp-slider .sp-slide:nth-child(${sp_slider_index + 1})`;
     }
 
-    function nextSlide() {
-        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "false");
-        document.querySelector(getCurrentSlideSelector()).inert = true;
-        sp_slider_index = (sp_slider_index + 1) % numSlides;
-        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "true");
-        document.querySelector(getCurrentSlideSelector()).inert = false;
+    function getCurrentIndicatorSelector() {
+        return `#sp-slider .indicators .indicator:nth-child(${sp_slider_index + 1})`;
     }
 
-    function previousSlide() {
-        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "false");
-        document.querySelector(getCurrentSlideSelector()).inert = true;
+    function setCurrentSlideState(on) {
+        if(on) {
+            document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "true");
+            document.querySelector(getCurrentSlideSelector()).inert = false;
+            document.querySelector(getCurrentIndicatorSelector()).setAttribute("data-active", "true");
+        } else {
+            document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "false");
+            document.querySelector(getCurrentSlideSelector()).inert = true;
+            document.querySelector(getCurrentIndicatorSelector()).setAttribute("data-active", "false");
+        }
+    }
+
+    function nextSlide(manual=false) {
+        if(manual && sp_slider_interval !== undefined) {
+            stopSliderAutoPlay();
+        }
+        setCurrentSlideState(false);
+        sp_slider_index = (sp_slider_index + 1) % numSlides;
+        setCurrentSlideState(true);
+    }
+
+    function previousSlide(manual=false) {
+        if(manual && sp_slider_interval !== undefined) {
+            stopSliderAutoPlay();
+        }
+        setCurrentSlideState(false);
         sp_slider_index = ((sp_slider_index - 1) + numSlides) % numSlides;
-        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "true");
-        document.querySelector(getCurrentSlideSelector()).inert = false;
+        setCurrentSlideState(true);
+    }
+
+    function jumpToSlide(newIndex) {
+        //inherently manual, this is never used as part of autoplay
+        if(/*manual && */sp_slider_interval !== undefined) {
+            stopSliderAutoPlay();
+        }
+        setCurrentSlideState(false);
+        sp_slider_index = newIndex;
+        setCurrentSlideState(true);
     }
 
     injectCss();
     constructSlider(getAllSliderData());
     constructSliderControls();
     startSliderAutoPlay();
+
+    //For mobile compat: find the largest post in the slider and clamp to that with room for the read more button
+    function HandleResize() {
+        if(window.innerWidth < 900) {
+            let maxHeight = 0;
+            document.querySelectorAll("#sp-slider .sp-slide .sp-slide-text-box").forEach(s => {
+                let thisSlidesHeight = 0;
+                s.querySelectorAll("*").forEach(e => {
+                    thisSlidesHeight += e.getBoundingClientRect().height;
+                });
+                if(maxHeight < thisSlidesHeight) {
+                    maxHeight = thisSlidesHeight;
+                }
+            });
+            document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', `${maxHeight + 135}px`);
+        } else {
+            document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', "400px");
+        }
+    }
+
+    HandleResize();
+    window.addEventListener("resize", () => {
+        HandleResize();
+    });
 }

@@ -1,8 +1,10 @@
 #sp-slider {
+    --sp-slider-height: 400px;
+
     overflow: hidden;
     position: relative; /*So that the text box can be position absolute and ignore the image width if it's big*/
     width: 100%;
-    height: 400px;
+    height: var(--sp-slider-height);
     margin-top: -40px; /*counteracting some out-of-article theme styling*/
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
     transition: opacity 0.5s ease;
@@ -17,12 +19,12 @@
         transition: opacity 0.5s ease;
 
         img {
-            height: 400px;
+            height: var(--sp-slider-height);
         }
 
         .sp-slide-text-box {
             width: 100%;
-            height: 400px;
+            height: var(--sp-slider-height);
             display: inline-block;        
             position: absolute;
             top: 0;
@@ -50,8 +52,89 @@
         opacity: 0;
         z-index: -1;
     }
+
+    .arrow {
+        bottom: 20px;
+        position: absolute;
+        font: normal 26px / 1 'Genericons';
+        vertical-align: top;
+        color: #FFFFFF;
+        background-color: var(--sp-brown);
+        opacity: 1;
+        border-radius: 3px;
+        padding: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .arrow::before {
+        content: '\f432';
+    }
+
+    .arrow.left {
+        left: 20px;
+        transform: rotate(-90deg) scale(1);
+    }
+
+    .arrow.left:hover {
+        transform: rotate(-90deg) scale(1.07);
+    }
+
+    .arrow.right {
+        right: 20px;
+        transform: rotate(90deg) scale(1);
+    }
+
+    .arrow.right:hover {
+        transform: rotate(90deg) scale(1.07);
+    }
+
+    .indicators {
+        --indicator-size: 20px;
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        height: var(--indicator-size);
+        bottom: 20px;
+
+        .indicator {
+            display: inline-block;
+            width: var(--indicator-size);
+            height: var(--indicator-size);
+            border: 5px solid var(--sp-brown);
+            border-radius: var(--indicator-size);
+            margin-inline: 5px;
+            cursor: pointer;
+        }
+
+        .indicator[data-active="true"] {
+            background-color: var(--sp-brown);
+        }
+    }
 }
 
 #sp-slider.hidden-until-js {
     opacity: 1;
+}
+
+@media (max-width: 900px) {
+    #sp-slider {
+        --sp-slider-height: 500px;
+
+        .sp-slide {
+
+            img + .sp-slide-text-box {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+/*Counteract weird theme styles*/
+@media screen and (max-width: 1308px) {
+    #sp-slider {
+        margin-left: -3%;
+        width: 106%;
+    }
 }
