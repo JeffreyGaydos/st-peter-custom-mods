@@ -1,10 +1,12 @@
 {
+    let numSlides = undefined;
     function getAllSliderData() {
         const sliderData = [];
         document.querySelectorAll("#sp-slider ul.lcp_catlist li").forEach((_, i) => {
             sliderData.push(getOneSlideData(i + 1));
         });
         console.log({sliderData});
+        numSlides = sliderData.length;
         return sliderData;
     }
 
@@ -43,6 +45,7 @@
         slideElement.id = "sp-slide-" + index;
         slideElement.classList.add("sp-slide");
         slideElement.setAttribute("data-active", index === 0);
+        slideElement.inert = index !== 0;
         if(slideData.img !== undefined) {
             const image = document.createElement("IMG");
             image.src = slideData.img.src;
@@ -76,12 +79,54 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.19";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.33";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
     }
 
+    let sp_slider_paused = false;
+    let sp_slider_index = 0;
+    let sp_slider_interval = undefined;
+
+    function constructSliderControls() {
+        //TODO
+        console.log("UNIMPLEMENTED");
+    }
+
+    function startSliderAutoPlay() {
+        sp_slider_interval = setInterval(() => {
+            console.log("AUTOPLAYED");
+            nextSlide();
+        }, 5000);
+    }
+
+    function stopSliderAutoPlay() {
+        clearInterval(sp_slider_interval);
+    }
+
+    function getCurrentSlideSelector() {
+        return `#sp-slider .sp-slide:nth-child(${sp_slider_index + 1})`;
+    }
+
+    function nextSlide() {
+        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "false");
+        document.querySelector(getCurrentSlideSelector()).inert = true;
+        sp_slider_index = (sp_slider_index + 1) % numSlides;
+        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "true");
+        document.querySelector(getCurrentSlideSelector()).inert = false;
+    }
+
+    function previousSlide() {
+        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "false");
+        document.querySelector(getCurrentSlideSelector()).inert = true;
+        sp_slider_index = ((sp_slider_index - 1) + numSlides) % numSlides;
+        document.querySelector(getCurrentSlideSelector()).setAttribute("data-active", "true");
+        document.querySelector(getCurrentSlideSelector()).inert = false;
+    }
+
     injectCss();
     constructSlider(getAllSliderData());
+    constructSliderControls();
+    startSliderAutoPlay();
 }
