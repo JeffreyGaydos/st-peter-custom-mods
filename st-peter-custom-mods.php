@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: St. Peter Custom Mods
-Version: 0.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
+Version: 0.0.2 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
 
 Description: A plugin created for St. Peter Parish for any and all customizations that could be easily implemented in a plugin
 */
@@ -53,7 +53,7 @@ if( !function_exists("spc_acp_page") ) {
                 do_settings_sections( 'spc-settings' );
             ?>
             <h2>Mass Schedule</h2>
-            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn Off Mass Schedule System</input>
+            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
             <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
             <p>Current "Default" Mass Times</p>
             <ul>
@@ -73,6 +73,9 @@ if( !function_exists("spc_acp_page") ) {
             </select>
             <input type="time" id="ms-time">
             
+            <h2>Custom Slider</h2>
+            <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+
             <?php
                 submit_button();
             ?>
@@ -113,5 +116,6 @@ if( !function_exists("spc_generate_list_from_text") ) {
 if( !function_exists("update_spc_info") ) {
     function update_spc_info() {
         register_setting( 'spc-settings', 'spc_masstimes' );
+        register_setting( 'spc-settings', 'spc_slider' );
     }
 }
