@@ -71,7 +71,7 @@
     }
 
     .autoplay-toggle {
-        top: 20px /*20px*/; /*now that these are buttons, we need -10px for some reason...*/
+        top: 20px;
         position: absolute;
         font: normal 26px / 1 'Genericons';
         vertical-align: top;

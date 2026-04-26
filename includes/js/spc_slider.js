@@ -91,7 +91,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.130";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.131";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
