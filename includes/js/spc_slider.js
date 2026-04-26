@@ -91,7 +91,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.126";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.130";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -160,7 +160,7 @@
         if(sp_slider_interval) {
             stopSliderAutoPlay();
         } else {
-            nextSlide(); // It's likely that the user is done looking at the current slide and that's why want to start autoplay again
+            nextSlide(); // It's likely that the user is done looking at the current slide and that's why they want to start autoplay again
             startSliderAutoPlay();
         }
     }
