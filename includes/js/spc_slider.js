@@ -35,6 +35,15 @@
     function constructSlider(data) {
         document.querySelector("#sp-slider ul.lcp_catlist").remove();
 
+        // A spot for all the controls so they come first in the tab index order naturally. They are all absolutely positioned anyways
+        const controlsWrapper = document.createElement("FIELDSET");
+        controlsWrapper.classList.add("controls-wrapper");
+        const visuallyHiddenLegend = document.createElement("LEGEND");
+        visuallyHiddenLegend.classList.add("visually-hidden");
+        visuallyHiddenLegend.innerText = "Slider controls";
+        controlsWrapper.appendChild(visuallyHiddenLegend);
+        document.querySelector("#sp-slider").appendChild(controlsWrapper);
+
         const sliderElement = document.querySelector("#sp-slider");
         data.forEach((sd, i) => {
             constructSlide(sd, i, sliderElement);
@@ -80,7 +89,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.107";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.118";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -91,8 +100,9 @@
     let sp_slider_interval = undefined;
 
     function constructSliderControls() {
-        const parent = document.querySelector("#sp-slider");
+        const parent = document.querySelector("#sp-slider .controls-wrapper");
 
+        const pauseToggle = constructPauseToggle(parent);
         const leftArrow = constructSliderArrow(true, parent);
         const rightArrow = constructSliderArrow(false, parent);
         const positionIndicators = constructIndicators(parent);
@@ -102,6 +112,7 @@
         const arrow = document.createElement("BUTTON");
         arrow.classList.add("arrow");
         arrow.classList.add(left ? "left" : "right");
+        arrow.title = (left ? "Previous" : "Next") + " slide";
         arrow.addEventListener("click",
             left
                 ? () => { previousSlide(true); }
@@ -119,6 +130,7 @@
                 indicator.classList.add("indicator");
                 indicator.classList.add("hover-scale-2");
                 indicator.setAttribute("data-active", i === 0);
+                indicator.title = `Slide ${i + 1}`;
                 indicator.addEventListener("click", () => {
                     jumpToSlide(i);
                 });
@@ -128,19 +140,53 @@
         }
     }
 
+    function constructPauseToggle(parent) {
+        const toggle = document.createElement("BUTTON");
+        toggle.classList.add("autoplay-toggle");
+        toggle.classList.add("play");
+        toggle.classList.add("hover-scale-2");
+        toggle.title = "Pause slider autoplay";
+        toggle.setAttribute("data-carousel-autoplay", undefined); //a11y
+        toggle.addEventListener("click", () => {
+            toggleAutoPlay();
+        });
+        parent.appendChild(toggle);
+    }
+
+    function toggleAutoPlay() {
+        if(sp_slider_interval) {
+            stopSliderAutoPlay();
+        } else {
+            nextSlide(); // It's likely that the user is done looking at the current slide and that's why want to start autoplay again
+            startSliderAutoPlay();
+        }
+    }
+
     function startSliderAutoPlay() {
         sp_slider_interval = setInterval(() => {
             nextSlide();
         }, 10000);
+
+        const autoPlayToggleElement = document.querySelector("#sp-slider button.autoplay-toggle");
+        if(autoPlayToggleElement && !autoPlayToggleElement.classList.contains("play")) {
+            autoPlayToggleElement.classList.add("play");
+            autoPlayToggleElement.title = "Pause slider autoplay";
+        }
     }
 
     function stopSliderAutoPlay() {
         clearInterval(sp_slider_interval);
         sp_slider_interval = undefined;
+
+        const autoPlayToggleElement = document.querySelector("#sp-slider button.autoplay-toggle");
+        if(autoPlayToggleElement && autoPlayToggleElement.classList.contains("play")) {
+            autoPlayToggleElement.classList.remove("play");
+            autoPlayToggleElement.title = "Start slider autoplay";
+        }
     }
 
     function getCurrentSlideSelector() {
-        return `#sp-slider .sp-slide:nth-child(${sp_slider_index + 1})`;
+        return `#sp-slider .sp-slide:nth-child(${sp_slider_index + 2})`; //plus 1 for index issues, plus another 1 to account for the controls-wrapper div
     }
 
     function getCurrentIndicatorSelector() {
