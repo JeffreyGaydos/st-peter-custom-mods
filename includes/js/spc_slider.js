@@ -76,7 +76,9 @@
         const buttonElement = document.createElement("BUTTON");
         buttonElement.classList.add("sp-slide-button");
         buttonElement.innerText = "Read More";
-        buttonElement.onClick = "window.location.href = " + slideData.href;
+        buttonElement.addEventListener("click", () => {
+            window.location.href = slideData.href;
+        });
         contentBox.appendChild(titleElement);
         contentBox.appendChild(dateElement);
         contentBox.appendChild(excerptElement);
@@ -89,7 +91,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.118";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.126";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -111,6 +113,7 @@
     function constructSliderArrow(left, parent) {
         const arrow = document.createElement("BUTTON");
         arrow.classList.add("arrow");
+        arrow.classList.add("hover-scale-2");
         arrow.classList.add(left ? "left" : "right");
         arrow.title = (left ? "Previous" : "Next") + " slide";
         arrow.addEventListener("click",

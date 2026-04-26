@@ -8,12 +8,17 @@
     margin-top: -40px; /*counteracting some out-of-article theme styling*/
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
     transition: opacity 0.5s ease;
+    z-index: 0;
 
     .controls-wrapper {
-        z-index: 1; /*Ensures controls are always on top of slide content*/
+        z-index: 1; /*Ensures controls are always on top of slide content but not above the dropdowns*/
         position: relative;
         width: 100%;
         height: 100%;
+        pointer-events: none;
+        * {
+            pointer-events: all;
+        }
     }
 
     .sp-slide {
@@ -25,6 +30,7 @@
         opacity: 1;
         transition: opacity 0.5s ease;
         display: flex; /*This alone allows the text box and image to stretch as much as they want without going over*/
+        z-index: 0; /*To make sure the controls are visible*/
 
         img {
             position: static;
@@ -101,26 +107,20 @@
         z-index: 1;
     }
 
-    .arrow::before {
-        content: '\f432';
+    .arrow.right::before {
+        content: '\f501';
+    }
+
+    .arrow.left::before {
+        content: '\f503';
     }
 
     .arrow.left {
         left: 20px;
-        transform: rotate(-90deg) scale(1);
-    }
-
-    .arrow.left:hover {
-        transform: rotate(-90deg) scale(1.07);
     }
 
     .arrow.right {
         right: 20px;
-        transform: rotate(90deg) scale(1);
-    }
-
-    .arrow.right:hover {
-        transform: rotate(90deg) scale(1.07);
     }
 
     .indicators {
