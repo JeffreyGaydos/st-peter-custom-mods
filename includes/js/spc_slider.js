@@ -187,10 +187,12 @@
         setCurrentSlideState(true);
     }
 
-    injectCss();
-    constructSlider(getAllSliderData());
-    constructSliderControls();
-    startSliderAutoPlay();
+    if(!!document.querySelector("#sp-slider")) {
+        injectCss();
+        constructSlider(getAllSliderData());
+        constructSliderControls();
+        startSliderAutoPlay();
+    }
 
     //For mobile compat: find the largest post in the slider and clamp to that with room for the read more button
     function HandleResize() {
@@ -204,7 +206,7 @@
                 maxHeight = thisSlidesHeight;
             }
         });
-        document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', `${maxHeight + 135}px`);
+        document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', `${Math.max(400, maxHeight + 135)}px`);
     }
 
     document.addEventListener("DOMContentLoaded", function() {
