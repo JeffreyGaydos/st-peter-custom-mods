@@ -17,26 +17,24 @@
         height: 100%;
         opacity: 1;
         transition: opacity 0.5s ease;
+        display: flex; /*This alone allows the text box and image to stretch as much as they want without going over*/
 
         img {
+            position: static;
             height: var(--sp-slider-height);
+            max-height: 400px;
+            margin-block: auto;
         }
 
         .sp-slide-text-box {
             width: 100%;
             height: var(--sp-slider-height);
             display: inline-block;        
-            position: absolute;
-            top: 0;
-            right: 0;
+            position: static;
             background-color: white;
             box-shadow: -2px 0px 4px rgba(0, 0, 0, 0.3);
             z-index: 0;
-            padding: 4dvw;
-        }
-
-        img + .sp-slide-text-box {
-            width: 65%;
+            padding: 3dvw;
         }
 
         .sp-slide-date {
@@ -109,6 +107,7 @@
             cursor: pointer;
             padding: 0;
             background-color: unset;
+            transition: transform 0.2s ease;
         }
 
         .indicator[data-active="true"] {
@@ -127,9 +126,8 @@
 
         .sp-slide {
 
-            img + .sp-slide-text-box {
-                width: 100%;
-                height: 100%;
+            img {
+                display: none;
             }
         }
     }

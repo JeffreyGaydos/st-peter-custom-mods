@@ -22,6 +22,7 @@
         slideData.img = {};
         slideData.img.src = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("src");
         slideData.img.srcset = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("srcset");
+        slideData.img.originalSrc = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("src").replace(/-[0-9]{3}x[0-9]{3}/g, "");
         slideData.img.alt = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("alt");
 
         if(slideData.img.src === undefined) {
@@ -48,8 +49,8 @@
         slideElement.inert = index !== 0;
         if(slideData.img !== undefined) {
             const image = document.createElement("IMG");
-            image.src = slideData.img.src;
-            image.srcset = slideData.img.srcset;
+            image.src = slideData.img.originalSrc;
+            // image.srcset = slideData.img.srcset;
             image.alt = slideData.img.alt;
             slideElement.appendChild(image);
         }
@@ -79,7 +80,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.91";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_slider.css?v1.107";
         style.id = "spc_slider_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -116,6 +117,7 @@
             for(let i = 0; i < numSlides; i++) {
                 const indicator = document.createElement("BUTTON");
                 indicator.classList.add("indicator");
+                indicator.classList.add("hover-scale-2");
                 indicator.setAttribute("data-active", i === 0);
                 indicator.addEventListener("click", () => {
                     jumpToSlide(i);
@@ -192,24 +194,23 @@
 
     //For mobile compat: find the largest post in the slider and clamp to that with room for the read more button
     function HandleResize() {
-        if(window.innerWidth < 900) {
-            let maxHeight = 0;
-            document.querySelectorAll("#sp-slider .sp-slide .sp-slide-text-box").forEach(s => {
-                let thisSlidesHeight = 0;
-                s.querySelectorAll("*").forEach(e => {
-                    thisSlidesHeight += e.getBoundingClientRect().height;
-                });
-                if(maxHeight < thisSlidesHeight) {
-                    maxHeight = thisSlidesHeight;
-                }
+        let maxHeight = 0;
+        document.querySelectorAll("#sp-slider .sp-slide .sp-slide-text-box").forEach(s => {
+            let thisSlidesHeight = 0;
+            s.querySelectorAll("*").forEach(e => {
+                thisSlidesHeight += e.getBoundingClientRect().height;
             });
-            document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', `${maxHeight + 135}px`);
-        } else {
-            document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', "400px");
-        }
+            if(maxHeight < thisSlidesHeight) {
+                maxHeight = thisSlidesHeight;
+            }
+        });
+        document.querySelector("#sp-slider").style.setProperty('--sp-slider-height', `${maxHeight + 135}px`);
     }
 
-    HandleResize();
+    document.addEventListener("DOMContentLoaded", function() {
+        HandleResize();
+    });
+
     window.addEventListener("resize", () => {
         HandleResize();
     });

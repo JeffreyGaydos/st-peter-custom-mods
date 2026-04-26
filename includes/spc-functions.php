@@ -36,6 +36,6 @@ if(get_option('spc_slider') == 'on') {
 
 if( !function_exists("spc_slider") ) {
     function spc_slider() {
-        wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.246');
+        wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.285');
     }
 }
