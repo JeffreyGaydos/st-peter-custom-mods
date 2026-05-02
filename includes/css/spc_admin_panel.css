@@ -1,14 +1,23 @@
-td {
-    border: 1px solid black;
-    padding-inline: 30px;
-    margin: 0;
-}
+.sp-admin-panel {
+    td {
+        border: 1px solid black;
+        padding-inline: 30px;
+        margin: 0;
+    }
 
-td#s {
-    color: green;
-}
+    td#s {
+        color: green;
+    }
 
-td#p {
-    background-color: orange;
-    font-weight: 600;
+    td#p {
+        background-color: orange;
+        font-weight: 600;
+    }
+
+    fieldset {
+        border-width: 2px;
+        border-style: groove;
+        padding-block: 0.35em 0.625em;
+        padding-inline: 0.75em;
+    }
 }
