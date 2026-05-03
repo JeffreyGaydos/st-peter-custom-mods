@@ -60,34 +60,64 @@ function LoadRawJson() {
     parsedJson.forEach(j => MassTimes.push(j));
 }
 
-function InitializeAddMassTimeForm() {
-    const frequencySelect = document.querySelector("#ms-frequency");
+function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
+    const dayOfWeekClass = "ms-day-of-week";
+    const dateClass = "ms-date";
+    const dayOfWeekSelector = `${commonAncestorSelector} .${dayOfWeekClass}, ${commonAncestorSelector} [for='${dayOfWeekClass}']`;
+    const dateSelector = `${commonAncestorSelector} .${dateClass}, ${commonAncestorSelector} [for='${dateClass}']`;
+    if(selectedFrequency === Frequency.Weekly) {
+        document.querySelectorAll(dayOfWeekSelector).forEach(e => {
+            e.style.display = "inline-block";
+        });
+        document.querySelectorAll(dateSelector).forEach(e => {
+            e.style.display = "none";
+        });
+    } else if(selectedFrequency === Frequency.OneTime) {
+        document.querySelectorAll(dayOfWeekSelector).forEach(e => {
+            e.style.display = "none";
+        });
+        document.querySelectorAll(dateSelector).forEach(e => {
+            e.style.display = "inline-block";
+        });
+    } else {
+        document.querySelectorAll(dayOfWeekSelector).forEach(e => {
+            e.style.display = "none";
+        });
+        document.querySelectorAll(dateSelector).forEach(e => {
+            e.style.display = "none";
+        });
+    }
+}
+
+function GenerateFrequencyDropdownOptions(parent, commonAncestorSelector) {
     Object.values(Frequency).forEach(f => {
         const frequencyOption = document.createElement("OPTION");
         frequencyOption.setAttribute("value", f);
         frequencyOption.innerText = f;
-        frequencySelect.appendChild(frequencyOption);
-    });
-    frequencySelect.addEventListener("change", (e) => {
-        if(e.target.value === Frequency.Weekly) {
-            document.querySelector("#ms-day-of-week").removeAttribute("disabled");
-            document.querySelector("#ms-date").setAttribute("disabled", undefined);
-        } else if(e.target.value === Frequency.OneTime) {
-            document.querySelector("#ms-day-of-week").setAttribute("disabled", undefined);
-            document.querySelector("#ms-date").removeAttribute("disabled");
-        } else {
-            document.querySelector("#ms-day-of-week").setAttribute("disabled", undefined);
-            document.querySelector("#ms-date").setAttribute("disabled", undefined);
-        }
+        parent.appendChild(frequencyOption);
     });
 
-    const daySelect = document.querySelector("#ms-day-of-week");
+    parent.addEventListener("change", (e) => {
+        HandleDayOfWeekDateHiding(e.target.value, commonAncestorSelector);
+    });
+}
+
+function GenerateDayOfWeekDropdownOptions(parent) {
     Object.values(Day).forEach(f => {
         const dayOption = document.createElement("OPTION");
         dayOption.setAttribute("value", f);
         dayOption.innerText = f;
-        daySelect.appendChild(dayOption);
+        parent.appendChild(dayOption);
     });
+}
+
+function InitializeAddMassTimeForm() {
+    const frequencySelect = document.querySelector("#ms-frequency");
+    GenerateFrequencyDropdownOptions(frequencySelect, "#ms-add-time-fs");
+    HandleDayOfWeekDateHiding(undefined, "#ms-add-time-fs");
+
+    const daySelect = document.querySelector("#ms-day-of-week");
+    GenerateDayOfWeekDropdownOptions(daySelect);
 
     const addButton = document.querySelector("#ms-add-button");
     addButton.addEventListener("click", (e) => {
@@ -112,12 +142,135 @@ function InitializeAddMassTimeForm() {
         document.querySelector("#ms-json").innerText = JSON.stringify(originalJson);
         SaveMassTimes();
     });
+
+    document.querySelector("#ms-add-loading-indicator").remove();
+    document.querySelectorAll("#ms-add-time-fs select, #ms-add-time-fs input, #ms-add-time-fs button").forEach(f => {
+        f.removeAttribute("disabled");
+    });
+    document.querySelector("#ms-add-time-fs").style.display = "inline-block";
 }
 
 function InitializeEditMassTimeFormTable() {
+    const parent = document.querySelector("#ms-tbody");
     MassTimes.forEach(m => {
-        
+        parent.appendChild(CreateOneRow(m));
+        HandleDayOfWeekDateHiding(m.Frequency, "#ms-row-" + m.ID)
     });
+    if(MassTimes.length == 0) {
+        document.querySelector("#ms-existing-loading-indicator").innerText = "None yet!";
+    } else {
+        document.querySelector("#ms-existing-loading-indicator").remove();
+    }
+}
+
+function CreateOneRow(mt) {
+    const row = document.createElement("TR");
+    row.id = "ms-row-" + mt.ID;
+    const time = document.createElement("TD");
+
+    const frequencyDropdown = document.createElement("SELECT");
+    frequencyDropdown.id = "ms-frequency";
+    const frequencyPlaceholder = document.createElement("OPTION");
+    frequencyPlaceholder.innerText = "Select Mass frequency";
+    frequencyPlaceholder.setAttribute("disabled", undefined);
+    frequencyPlaceholder.style.display = "none";
+    frequencyPlaceholder.value = "-1";
+    frequencyDropdown.appendChild(frequencyPlaceholder);
+    GenerateFrequencyDropdownOptions(frequencyDropdown, "#" + row.id);
+    frequencyDropdown.value = mt.Frequency;
+
+    const dayDropdown = document.createElement("SELECT");
+    dayDropdown.classList.add("ms-day-of-week");
+    const dayPlaceholder = document.createElement("OPTION");
+    dayPlaceholder.innerText = "Select a day...";
+    dayPlaceholder.setAttribute("disabled", undefined);
+    dayPlaceholder.setAttribute("selected", undefined);
+    dayPlaceholder.style.display = "none";
+    dayPlaceholder.value = "-1";
+    dayDropdown.appendChild(dayPlaceholder);
+    GenerateDayOfWeekDropdownOptions(dayDropdown);
+    if(mt.Day)
+        dayDropdown.value = mt.Day;
+
+    const datePicker = document.createElement("INPUT");
+    datePicker.classList.add("ms-date");
+    datePicker.setAttribute("type", "date");    
+    if(mt.Date)
+        datePicker.value = mt.Date;
+    
+    const timePicker = document.createElement("INPUT");
+    timePicker.classList.add("ms-time");
+    timePicker.setAttribute("type", "time");
+    timePicker.value = mt.Time;
+
+    time.appendChild(frequencyDropdown);
+    const spanOn = document.createElement("SPAN");
+    spanOn.innerText = " on ";
+    time.appendChild(spanOn);
+    time.appendChild(dayDropdown);
+    time.appendChild(datePicker);
+    const spanAt = document.createElement("SPAN");
+    spanAt.innerText = " at ";
+    time.appendChild(spanAt);
+    time.appendChild(timePicker);
+
+    row.appendChild(time);
+    
+    const cancel = document.createElement("TD");
+    GenerateCheckboxLabelAndDropdown(cancel, mt, "cancel", "Cancel", "Indefinitely", 10);
+    // TODO translate "mt.CancelledUntil" into the proper UI here, and back again
+
+    row.appendChild(cancel);
+
+    const additionalNotes = document.createElement("TD");
+    const additionalNotesInput = document.createElement("INPUT");
+    additionalNotesInput.classList.add("ms-additional-notes");
+    additionalNotesInput.setAttribute("type", "text");
+    additionalNotesInput.value = mt.AdditionalNotes;
+    additionalNotes.appendChild(additionalNotesInput);
+
+    row.appendChild(additionalNotes);
+
+    const _delete = document.createElement("TD");
+    GenerateCheckboxLabelAndDropdown(_delete, mt, "delete", "Delete", "Permanently", 10);
+
+    // TODO translate "mt.DeletedUtil" into the proper UI here, and back again
+    row.appendChild(_delete);
+
+    const saveState = document.createElement("TD");
+    saveState.id = `ms-save-state-${mt.ID}`;
+    saveState.classList.add("s");
+    saveState.innerText = "Saved!";
+
+    row.appendChild(saveState);
+
+    return row;
+}
+
+function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText, firstDropdownText, numOtherOptions) {
+    const checkbox = document.createElement("INPUT");
+    checkbox.classList.add(`ms-${slugForClasses}`);
+    checkbox.setAttribute("type", "checkbox");
+    checkbox.id = `ms-${slugForClasses}-${mt.ID}`;
+    parent.appendChild(checkbox);
+    const label = document.createElement("LABEL");
+    label.classList = `ms-${slugForClasses}-label`;
+    label.innerText = labelText;
+    parent.appendChild(label);
+    const lengthDropdown = document.createElement("SELECT");
+    lengthDropdown.classList = `ms-${slugForClasses}-dropdown`;
+    lengthDropdown.setAttribute("disabled", undefined);
+    const optionOne = document.createElement("OPTION");
+    optionOne.innerText = firstDropdownText;
+    optionOne.value = "-1";
+    lengthDropdown.appendChild(optionOne);
+    for(var i = 1; i <= numOtherOptions; i++) {
+        const nextOption = document.createElement("OPTION");
+        nextOption.innerText = `Next ${i} occurance` + (i > 1 ? "s" : "");
+        nextOption.value = `${i}`;
+        lengthDropdown.appendChild(nextOption);
+    }
+    parent.appendChild(lengthDropdown);
 }
 
 function InitializePreview() {
@@ -174,10 +327,10 @@ function ValidateNewMassTimesObject() {
     if(frequencyField.value === "-1") {
         frequencyField.setCustomValidity("Please select a frequency");
     }
-    if(dayField.value === "-1") {
+    if(frequencyField.value === Frequency.Weekly && dayField.value === "-1") {
         dayField.setCustomValidity("Please select a day of the week");
     }
-    if(dateField.value === "") {
+    if(frequencyField.value === Frequency.OneTime && dateField.value === "") {
         dateField.setCustomValidity("Plase select a date");
     }
     if(timeField.value === "") {
@@ -186,6 +339,7 @@ function ValidateNewMassTimesObject() {
 
     allFields.forEach(f => {
         f.checkVisibility();
+        console.log({ f, valid: f.reportValidity() });
     });
 
     return !allFields.some(f => !f.reportValidity());

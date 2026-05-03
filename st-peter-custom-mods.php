@@ -35,8 +35,8 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.2');
-    wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.0');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.3');
+    wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.1');
 }
 
 //Creates the html of the plugin's setting page, passing data through the backend as needed
@@ -60,33 +60,31 @@ if( !function_exists("spc_acp_page") ) {
             <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
             <textarea type="text" name="spc_masstimes_json" id="ms-json" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
             <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
-            <fieldset>
-                <legend>Add a New Mass Time Settings</legend>
+            <h4 id="ms-add-loading-indicator">Loading...</h4>
+            <fieldset id="ms-add-time-fs" style="display: none">
+                <legend>Add a New Mass Time</legend>
                 <label for="ms-frequency">Frequency: </label>
-                <select id="ms-frequency">
+                <select id="ms-frequency" class="ms-frequency" disabled>
                     <option style="display: none" value="-1" disabled selected>Select Mass frequency...</option>
                 </select>
                 <br/>
                 <label for="ms-day-of-week">Day of Week</label>
-                <select id="ms-day-of-week" disabled>
+                <select id="ms-day-of-week" class="ms-day-of-week" disabled>
                     <option style="display: none" value="-1" disabled selected>Select a day...</option>
-                    
                 </select>
-                <span style="font-style: italic">(for weekly frequency only)</span>
                 <br/>
                 <label for="ms-date">Date</label>
-                <input type="date" id="ms-date" disabled>
-                <span style="font-style: italic">(for one-time frequency only)</span>
+                <input type="date" id="ms-date" class="ms-date" disabled>
                 <br/>
                 <label for="ms-time">Time of Day</label>
-                <input type="time" id="ms-time">
+                <input type="time" id="ms-time" disabled>
                 <br/>
                 <label for="ms-additional-notes">Additional Notes</label>
-                <input type="text" id="ms-additional-notes" />
+                <input type="text" id="ms-additional-notes" disabled/>
                 <span style="font-style: italic">(HTML code Supported)</span>
                 <br/>
                 <br/>
-                <button id="ms-add-button" class="button button-primary">Add this Mass Time</button>
+                <button id="ms-add-button" class="button button-primary" disabled>Add this Mass Time</button>
             </fieldset>
             <div>
                 <h3>Current Configured Mass Times</h3>
@@ -100,118 +98,8 @@ if( !function_exists("spc_acp_page") ) {
                             <th>Is Actually Saved</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Sunday, 11:30 AM Every Week</td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Cancel</input>
-                                <select name="ms-frequency">
-                                    <option value="-1">Indefinitely</option>
-                                    <option value="0">Next 1 occurance</option>
-                                    <option value="0">Next 2 occurances</option>
-                                    <option value="0">Next 3 occurances</option>
-                                    <option value="0">Next 4 occurances</option>
-                                    <option value="0">Next 5 occurances</option>
-                                    <option value="0">Next 6 occurances</option>
-                                    <option value="0">Next 7 occurances</option>
-                                    <option value="0">Next 8 occurances</option>
-                                    <option value="0">Next 9 occurances</option>
-                                    <option value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td><input type="text" name="ms-notes"></input></td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Delete</input>
-                                <select name="ms-frequency">
-                                    <option value="-1">Permanently</option>
-                                    <option value="0">Next 1 occurance</option>
-                                    <option value="0">Next 2 occurances</option>
-                                    <option value="0">Next 3 occurances</option>
-                                    <option value="0">Next 4 occurances</option>
-                                    <option value="0">Next 5 occurances</option>
-                                    <option value="0">Next 6 occurances</option>
-                                    <option value="0">Next 7 occurances</option>
-                                    <option value="0">Next 8 occurances</option>
-                                    <option value="0">Next 9 occurances</option>
-                                    <option value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td id="s">Saved!</td>
-                        </tr>
-                        <tr>
-                            <td>Sunday, 7:00 PM Every Week</td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Cancel</input>
-                                <select name="ms-frequency">
-                                    <option value="-1">Indefinitely</option>
-                                    <option value="0">Next 1 occurance</option>
-                                    <option value="0">Next 2 occurances</option>
-                                    <option value="0">Next 3 occurances</option>
-                                    <option value="0">Next 4 occurances</option>
-                                    <option value="0">Next 5 occurances</option>
-                                    <option value="0">Next 6 occurances</option>
-                                    <option value="0">Next 7 occurances</option>
-                                    <option value="0">Next 8 occurances</option>
-                                    <option value="0">Next 9 occurances</option>
-                                    <option value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td><input type="text" name="ms-notes"></input></td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Delete</input>
-                                <select name="ms-frequency">
-                                    <option value="-1">Permanently</option>
-                                    <option value="0">Next 1 occurance</option>
-                                    <option value="0">Next 2 occurances</option>
-                                    <option value="0">Next 3 occurances</option>
-                                    <option value="0">Next 4 occurances</option>
-                                    <option value="0">Next 5 occurances</option>
-                                    <option value="0">Next 6 occurances</option>
-                                    <option value="0">Next 7 occurances</option>
-                                    <option value="0">Next 8 occurances</option>
-                                    <option value="0">Next 9 occurances</option>
-                                    <option value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td id="p">Pending Changes - Not Saved!</td>
-                        </tr>
-                        <tr>
-                            <td>Sunday, March 5th 4:00 PM</td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Cancel</input>
-                                <select disabled name="ms-frequency" title="One Time frequency Mass times can only be permanently affected">
-                                    <option value="-1">Indefinitely</option>
-                                    <option disabled value="0">Next 1 occurance</option>
-                                    <option disabled value="0">Next 2 occurances</option>
-                                    <option disabled value="0">Next 3 occurances</option>
-                                    <option disabled value="0">Next 4 occurances</option>
-                                    <option disabled value="0">Next 5 occurances</option>
-                                    <option disabled value="0">Next 6 occurances</option>
-                                    <option disabled value="0">Next 7 occurances</option>
-                                    <option disabled value="0">Next 8 occurances</option>
-                                    <option disabled value="0">Next 9 occurances</option>
-                                    <option disabled value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td><input type="text" name="ms-notes"></input></td>
-                            <td>
-                                <input type="checkbox" name="ms-cancel">Delete</input>
-                                <select disabled name="ms-frequency" title="One Time frequency Mass times can only be permanently affected">
-                                    <option value="-1">Permanently</option>
-                                    <option disabled value="0">Next 1 occurance</option>
-                                    <option disabled value="0">Next 2 occurances</option>
-                                    <option disabled value="0">Next 3 occurances</option>
-                                    <option disabled value="0">Next 4 occurances</option>
-                                    <option disabled value="0">Next 5 occurances</option>
-                                    <option disabled value="0">Next 6 occurances</option>
-                                    <option disabled value="0">Next 7 occurances</option>
-                                    <option disabled value="0">Next 8 occurances</option>
-                                    <option disabled value="0">Next 9 occurances</option>
-                                    <option disabled value="0">Next 10 occurances</option>
-                                </select>
-                            </td>
-                            <td id="s">Saved!</td>
-                        </tr>
+                    <tbody id="ms-tbody">
+                        <h4 id="ms-existing-loading-indicator">Loading...</h4>
                     </tbody>
                 </table>
             </div>
