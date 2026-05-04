@@ -35,7 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.3');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.4');
     wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.1');
 }
 
