@@ -35,13 +35,15 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.1');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.4');
+    wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.1');
 }
 
 //Creates the html of the plugin's setting page, passing data through the backend as needed
 if( !function_exists("spc_acp_page") ) {
     function spc_acp_page() {
         ?>
+        <div class="sp-admin-panel">
             <h1>St. Peter Custom Mods</h1>
             <p>Make sure you click the "Save Changes" button at the bottom otherwise nothing will actually change</p>
             <br>
@@ -52,34 +54,64 @@ if( !function_exists("spc_acp_page") ) {
             <?php
                 do_settings_sections( 'spc-settings' );
             ?>
-            <h2>Mass Schedule</h2>
-            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
-            <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
-            <p>Current "Default" Mass Times</p>
-            <ul>
-                <li>Sunday, 11:30 AM Every Week<input type="checkbox" name="ms-cancel">Cancel</input><button id="ms-delete">x</button></li>
-                <li>Sunday, 7:00 PM Every Week</li>
-            </ul>
-            <button>+ Add Another Day</button>
-            <select name="ms-day-of-week">
-                <option value="-1" disabled selected>Select a day...</option>
-                <option value="Sunday">Sunday</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-            </select>
-            <input type="time" id="ms-time">
-            
             <h2>Custom Slider</h2>
             <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+            <h2>Mass Schedule</h2>
+            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+            <textarea type="text" name="spc_masstimes_json" id="ms-json" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
+            <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
+            <h4 id="ms-add-loading-indicator">Loading...</h4>
+            <fieldset id="ms-add-time-fs" style="display: none">
+                <legend>Add a New Mass Time</legend>
+                <label for="ms-frequency">Frequency: </label>
+                <select id="ms-frequency" class="ms-frequency" disabled>
+                    <option style="display: none" value="-1" disabled selected>Select Mass frequency...</option>
+                </select>
+                <br/>
+                <label for="ms-day-of-week">Day of Week</label>
+                <select id="ms-day-of-week" class="ms-day-of-week" disabled>
+                    <option style="display: none" value="-1" disabled selected>Select a day...</option>
+                </select>
+                <br/>
+                <label for="ms-date">Date</label>
+                <input type="date" id="ms-date" class="ms-date" disabled>
+                <br/>
+                <label for="ms-time">Time of Day</label>
+                <input type="time" id="ms-time" disabled>
+                <br/>
+                <label for="ms-additional-notes">Additional Notes</label>
+                <input type="text" id="ms-additional-notes" disabled/>
+                <span style="font-style: italic">(HTML code Supported)</span>
+                <br/>
+                <br/>
+                <button id="ms-add-button" class="button button-primary" disabled>Add this Mass Time</button>
+            </fieldset>
+            <div>
+                <h3>Current Configured Mass Times</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Cancel</th>
+                            <th>Additional Notes</th>
+                            <th>Delete</th>
+                            <th>Is Actually Saved</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ms-tbody">
+                        <h4 id="ms-existing-loading-indicator">Loading...</h4>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Mass Times Preview:</h3>
+            </div>
 
             <?php
                 submit_button();
             ?>
             </form>
+        </div>
         <?php
     }
 }
@@ -116,6 +148,7 @@ if( !function_exists("spc_generate_list_from_text") ) {
 if( !function_exists("update_spc_info") ) {
     function update_spc_info() {
         register_setting( 'spc-settings', 'spc_masstimes' );
+        register_setting( 'spc-settings', 'spc_masstimes_json');
         register_setting( 'spc-settings', 'spc_slider' );
     }
 }
