@@ -514,8 +514,6 @@ function InitializePreview() {
     RenderPreview(MassTimes);
 }
 
-//TODOs
-// Make AdditionalNotes safer for the backend form
 function RenderPreview(json) {
     const purgedJson = PurgeStaleMassTimes(json);
     const preview = document.querySelector("#ms-preview-window");
