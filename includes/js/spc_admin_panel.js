@@ -439,7 +439,26 @@ function UntilDateToNumOccurances(ID, fieldName) {
 }
 
 function InitializePreview() {
+    RenderPreview(MassTimes);
+}
 
+function RenderPreview(json) {
+    const preview = document.querySelector("#ms-preview-window");
+    preview.innerHTML = ""; //clear any previous render
+    if(json.length > 0) {
+        const title = document.createElement("H2");
+        title.innerText = "Mass Times:";
+        preview.appendChild(title);
+        const listP = document.createElement("UL");
+        for(var i = 0; i < json.length; i++) {
+            const listE = document.createElement("LI");
+            const frequencyDay = json[i].Frequency === Frequency.Weekly ? `Every ${json[i].Day}` : ""
+            const timeString = json[i].Time.split(":")[0] > 12 ? `${json[i].Time.split(":")[0] - 12}:${json[i].Time.split(":")[1]} PM` : `${json[i].Time} AM`
+            listE.innerHTML = `${frequencyDay} at ${timeString}${json[i].AdditionalNotes}`
+            listP.appendChild(listE);
+        }
+        preview.appendChild(listP);
+    }
 }
 
 // Saves whatever is currently in the raw JSON textarea element

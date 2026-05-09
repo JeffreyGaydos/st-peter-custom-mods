@@ -36,7 +36,7 @@ function spc_settings_menu() {
 
 function load_admin_scripts( $hook ) {
     wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.6');
-    wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.1');
+    wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.2');
 }
 
 //Creates the html of the plugin's setting page, passing data through the backend as needed
@@ -126,7 +126,10 @@ if( !function_exists("spc_acp_page") ) {
                 </div>
                 <div>
                     <h3>Mass Times Preview:</h3>
+                    <div id="ms-preview-window"></div>
                 </div>
+                <br />
+                <br />
                 <input type="submit" class="button button-primary" id="ms-edit-button" value="Save Edits" disabled />
             </form>
         </div>
