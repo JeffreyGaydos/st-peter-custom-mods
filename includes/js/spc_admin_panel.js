@@ -221,12 +221,12 @@ function UpdateIsSavedIndicator(currentID) {
         currentSaveIndicator.innerText = "Pending unsaved changes";
         currentSaveIndicator.classList.remove("s");
         currentSaveIndicator.classList.add("p");
-        RenderPreview(MassTimesUpdates);
     } else {
         currentSaveIndicator.innerText = "Saved!";
         currentSaveIndicator.classList.remove("p");
         currentSaveIndicator.classList.add("s");
     }
+    RenderPreview(MassTimesUpdates);
 }
 
 function AnyDifferencesOnThisRow(ID) {
@@ -515,23 +515,27 @@ function InitializePreview() {
 }
 
 //TODOs
-// Render cancellation until the day after time
-// Render timed deletes (hidden) until the day after time
 // Make AdditionalNotes safer for the backend form
 function RenderPreview(json) {
+    const purgedJson = PurgeStaleMassTimes(json);
     const preview = document.querySelector("#ms-preview-window");
     preview.innerHTML = ""; //clear any previous render
-    if(json.length > 0) {
+    if(purgedJson.length > 0) {
         const title = document.createElement("H2");
         title.innerText = "Mass Times:";
         preview.appendChild(title);
         const listP = document.createElement("UL");
-        for(var i = 0; i < json.length; i++) {
+        for(var i = 0; i < purgedJson.length; i++) {
             const listE = document.createElement("LI");
-            const frequencyDay = json[i].Frequency === Frequency.Weekly ? `Every ${json[i].Day}` : `${json[i].Date}`
-            const timeString = json[i].Time.split(":")[0] > 12 ? `${json[i].Time.split(":")[0] - 12}:${json[i].Time.split(":")[1]} PM` : `${json[i].Time} AM`
-            listE.innerHTML = `${frequencyDay} at ${timeString}${json[i].AdditionalNotes}`
-            listP.appendChild(listE);
+            const frequencyDay = purgedJson[i].Frequency === Frequency.Weekly ? `Every ${purgedJson[i].Day}` : `${purgedJson[i].Date}`
+            const timeString = purgedJson[i].Time.split(":")[0] > 12 ? `${purgedJson[i].Time.split(":")[0] - 12}:${purgedJson[i].Time.split(":")[1]} PM` : `${purgedJson[i].Time} AM`
+            const isCancelled = purgedJson[i].CancelledUntil ? new Date() < new Date(new Date(purgedJson[i].CancelledUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].CancelledUntil === null;
+            const isDeleted = purgedJson[i].DeletedUntil ? new Date() < new Date(new Date(purgedJson[i].DeletedUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].DeletedUntil === null;
+            const cancelStartString = isCancelled ? '<span style="text-decoration: line-through">' : '';
+            const cancelEndString = isCancelled ? '</span><span style="font-weight: 600; color: red"> CANCELLED</span>' : '';
+            listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`
+            if(!isDeleted)
+                listP.appendChild(listE);
         }
         preview.appendChild(listP);
     }
