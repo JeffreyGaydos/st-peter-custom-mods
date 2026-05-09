@@ -1,3 +1,4 @@
+if(document.querySelector("#sp-slider"))
 {
     let numSlides = undefined;
     function getAllSliderData() {
