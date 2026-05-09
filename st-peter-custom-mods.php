@@ -70,7 +70,9 @@ if( !function_exists("spc_acp_page") ) {
                 <h2>Mass Schedule</h2>
                 <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
                 <textarea type="text" name="spc_masstimes_json" id="ms-json-add" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
-                <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
+                <p>
+                    <a href="https://github.com/JeffreyGaydos/st-peter-custom-mods/blob/main/MassTimesReadme.md">Help / Instructions</a>
+                </p>
                 <h4 id="ms-add-loading-indicator">Loading...</h4>
             
                 <fieldset id="ms-add-time-fs" style="display: none">
