@@ -112,6 +112,7 @@ if( !function_exists("spc_acp_page") ) {
                     <table>
                         <thead>
                             <tr>
+                                <th>Order</th>
                                 <th>Time</th>
                                 <th>Cancel</th>
                                 <th>Additional Notes</th>
@@ -124,13 +125,13 @@ if( !function_exists("spc_acp_page") ) {
                         </tbody>
                     </table>
                 </div>
+                <input type="submit" class="button button-primary" id="ms-edit-button" value="Save Edits" disabled />
                 <div>
                     <h3>Mass Times Preview:</h3>
                     <div id="ms-preview-window"></div>
                 </div>
                 <br />
                 <br />
-                <input type="submit" class="button button-primary" id="ms-edit-button" value="Save Edits" disabled />
             </form>
         </div>
         <?php

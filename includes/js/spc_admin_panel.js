@@ -211,23 +211,33 @@ function AddSaveFieldEventListener(formElement, fieldName, fieldValueFunc, curre
             console.error(`Could not find ID '${currentID}' in list of Mass Times. Cannot update.`);
         }
 
-        const currentSaveIndicator = document.querySelector(`#ms-save-state-${currentID}`);
-        if(AnyDifferencesOnThisRow(currentID)) {
-            currentSaveIndicator.innerText = "Pending unsaved changes";
-            currentSaveIndicator.classList.remove("s");
-            currentSaveIndicator.classList.add("p");
-        } else {
-            currentSaveIndicator.innerText = "Saved!";
-            currentSaveIndicator.classList.remove("p");
-            currentSaveIndicator.classList.add("s");
-        }
+        UpdateIsSavedIndicator(currentID);
     });
 }
+
+function UpdateIsSavedIndicator(currentID) {
+    const currentSaveIndicator = document.querySelector(`#ms-save-state-${currentID}`);
+    if(AnyDifferencesOnThisRow(currentID)) {
+        currentSaveIndicator.innerText = "Pending unsaved changes";
+        currentSaveIndicator.classList.remove("s");
+        currentSaveIndicator.classList.add("p");
+        RenderPreview(MassTimesUpdates);
+    } else {
+        currentSaveIndicator.innerText = "Saved!";
+        currentSaveIndicator.classList.remove("p");
+        currentSaveIndicator.classList.add("s");
+    }
+}
+
 function AnyDifferencesOnThisRow(ID) {
     const o = MassTimes.filter(m => m.ID === ID)[0];
     const u = MassTimesUpdates.filter(m => m.ID === ID)[0];
 
-    return o.Frequency !== u.Frequency
+    const oIndex = MassTimes.indexOf(o);
+    const uIndex = MassTimesUpdates.indexOf(u);
+
+    return oIndex !== uIndex
+        || o.Frequency !== u.Frequency
         || o.Date !== u.Date
         || o.Day !== u.Day
         || o.Time !== u.Time
@@ -239,6 +249,50 @@ function AnyDifferencesOnThisRow(ID) {
 function CreateOneRow(mt) {
     const row = document.createElement("TR");
     row.id = "ms-row-" + mt.ID;
+
+    const order = document.createElement("TD");
+    order.classList.add("ms-order");
+    const upButton = document.createElement("BUTTON");
+    upButton.innerText = "↑";
+    if(MassTimesUpdates.indexOf(MassTimesUpdates.filter(m => m.ID === mt.ID)[0]) === 0) {
+        upButton.setAttribute("disabled", undefined);
+    }
+    upButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        SwapWithAdjacentElement(mt.ID, 1);
+        const parent = document.querySelector("#ms-tbody");
+        parent.innerHTML = "";
+        MassTimesUpdates.forEach(mtu => {
+            parent.appendChild(CreateOneRow(mtu));
+            HandleDayOfWeekDateHiding(mtu.Frequency, "#ms-row-" + mtu.ID);
+            UpdateIsSavedIndicator(mtu.ID);
+            RenderPreview(MassTimesUpdates);
+        });
+        
+    });
+    const downButton = document.createElement("BUTTON");
+    downButton.innerText = "↓";
+    if(MassTimesUpdates.indexOf(MassTimesUpdates.filter(m => m.ID === mt.ID)[0]) === MassTimes.length - 1) { //Must use MassTimes.length since we are constructing MassTimesUpdates as we go
+        downButton.setAttribute("disabled", undefined);
+    }
+    downButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        SwapWithAdjacentElement(mt.ID, 0);
+        const parent = document.querySelector("#ms-tbody");
+        parent.innerHTML = "";
+        MassTimesUpdates.forEach(mtu => {
+            parent.appendChild(CreateOneRow(mtu));
+            HandleDayOfWeekDateHiding(mtu.Frequency, "#ms-row-" + mtu.ID);
+            UpdateIsSavedIndicator(mtu.ID);
+            RenderPreview(MassTimesUpdates);
+        });
+    });
+    order.appendChild(upButton);
+    order.appendChild(downButton);
+    row.appendChild(order);
+
     const time = document.createElement("TD");
 
     const frequencyDropdown = document.createElement("SELECT");
@@ -338,6 +392,24 @@ function CreateOneRow(mt) {
     return row;
 }
 
+//offset: 1 for up, 0 for down
+function SwapWithAdjacentElement(ID, offset) {
+    const thisIndex = MassTimesUpdates.indexOf(MassTimesUpdates.filter(m => m.ID === ID)[0]);
+    const me = MassTimesUpdates[thisIndex];
+    const swap = MassTimesUpdates[thisIndex - (offset === 1 ? 1 : -1)];
+    const before = [...MassTimesUpdates.slice(0, thisIndex - offset)];
+    const after = [...MassTimesUpdates.slice(thisIndex + 1 - (offset === 1 ? 1 : -1), MassTimesUpdates.length)];
+    NewMassTimesUpdates = [
+        ...before,
+        offset === 1 ? me : swap,
+        offset === 1 ? swap : me,
+        ...after
+    ]
+    for(var i = 0; i < MassTimesUpdates.length; i++) {
+        MassTimesUpdates[i] = NewMassTimesUpdates[i]
+    }
+}
+
 function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText, fieldName, firstDropdownText, numOtherOptions, jsonField, frequencyDropdown) {
     const checkbox = document.createElement("INPUT");
     checkbox.classList.add(`ms-${slugForClasses}`);
@@ -424,7 +496,7 @@ function NumOccurancesToUntilDate(numOccurances, ID) {
             overshoot = new Date(overshoot - (1000 * 60 * 60 * 24));
             safety--;
         }
-        return new Date(overshoot.toISOString().split("T")[0]); //overshoot without the time component
+        return new Date(overshoot.toISOString().split("T")[0] + "T" + MassTimesUpdates.filter(m => m.ID === ID)[0].Time); //overshoot without the time component
     }
 }
 
@@ -442,6 +514,10 @@ function InitializePreview() {
     RenderPreview(MassTimes);
 }
 
+//TODOs
+// Render cancellation until the day after time
+// Render timed deletes (hidden) until the day after time
+// Make AdditionalNotes safer for the backend form
 function RenderPreview(json) {
     const preview = document.querySelector("#ms-preview-window");
     preview.innerHTML = ""; //clear any previous render
@@ -452,7 +528,7 @@ function RenderPreview(json) {
         const listP = document.createElement("UL");
         for(var i = 0; i < json.length; i++) {
             const listE = document.createElement("LI");
-            const frequencyDay = json[i].Frequency === Frequency.Weekly ? `Every ${json[i].Day}` : ""
+            const frequencyDay = json[i].Frequency === Frequency.Weekly ? `Every ${json[i].Day}` : `${json[i].Date}`
             const timeString = json[i].Time.split(":")[0] > 12 ? `${json[i].Time.split(":")[0] - 12}:${json[i].Time.split(":")[1]} PM` : `${json[i].Time} AM`
             listE.innerHTML = `${frequencyDay} at ${timeString}${json[i].AdditionalNotes}`
             listP.appendChild(listE);
