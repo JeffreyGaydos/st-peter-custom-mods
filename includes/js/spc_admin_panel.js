@@ -66,8 +66,8 @@ const MassTimes = [];
 const MassTimesUpdates = [];
 
 function LoadRawJson() {
-    const rawJson = document.querySelector("#ms-json").value;
-    const parsedJson = JSON.parse(rawJson === "" ? "[]" : rawJson);
+    const rawJson = document.querySelector("#ms-json-add").value;
+    const parsedJson = PurgeStaleMassTimes(JSON.parse(rawJson === "" ? "[]" : rawJson));
     parsedJson.forEach(j => MassTimes.push(j));
 }
 
@@ -147,11 +147,11 @@ function InitializeAddMassTimeForm() {
             DeletedUntil: undefined,
         };
 
-        const rawJson = document.querySelector("#ms-json").value;
+        const rawJson = document.querySelector("#ms-json-add").value;
         const originalJson = JSON.parse(rawJson === "" ? "[]" : rawJson);
         originalJson.push(newMassTime);
-        document.querySelector("#ms-json").innerText = JSON.stringify(originalJson);
-        SaveMassTimes();
+        document.querySelector("#ms-json-add").innerText = JSON.stringify(PurgeStaleMassTimes(originalJson));
+        SaveAddMassTime(e);
     });
 
     document.querySelector("#ms-add-loading-indicator").remove();
@@ -164,17 +164,36 @@ function InitializeAddMassTimeForm() {
 function InitializeEditMassTimeFormTable() {
     const parent = document.querySelector("#ms-tbody");
     MassTimes.forEach(m => {
-        parent.appendChild(CreateOneRow(m));
-        HandleDayOfWeekDateHiding(m.Frequency, "#ms-row-" + m.ID);
+        // Must be first, some UI depends on this value
         MassTimesUpdates.push({
             ID: m.ID,
             Frequency: m.Frequency,
             Date: m.Date,
             Day: m.Day,
             Time: m.Time,
-            AdditionalNotes: m.AdditionalNotes
+            AdditionalNotes: m.AdditionalNotes,
+            CancelledUntil: m.CancelledUntil,
+            DeletedUntil: m.DeletedUntil
         });
+        parent.appendChild(CreateOneRow(m));
+        HandleDayOfWeekDateHiding(m.Frequency, "#ms-row-" + m.ID);
     });
+
+    document.querySelector("#ms-edit-button").addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let allValid = true;
+        MassTimesUpdates.forEach(m => {
+            allValid &= ValidateNewMassTimesObject(m.ID);
+        });
+        if(allValid) {
+            document.querySelector("#ms-json-edit").innerText = JSON.stringify(PurgeStaleMassTimes(MassTimesUpdates));
+            document.querySelector("#ms-edit-form").submit();
+        }
+    });
+    document.querySelector("#ms-edit-button").removeAttribute("disabled");
+
     if(MassTimes.length == 0) {
         document.querySelector("#ms-existing-loading-indicator").innerText = "None yet!";
     } else {
@@ -247,6 +266,11 @@ function CreateOneRow(mt) {
     if(mt.Day)
         dayDropdown.value = mt.Day;
     AddSaveFieldEventListener(dayDropdown, "Day", null, mt.ID);
+    dayDropdown.addEventListener("change", () => {
+        //If the day changes and there is a cancellation in progress, reset that field and those values beacuse they are no longer accurate
+        ResetCheckboxState(mt.ID, "cancel");
+        ResetCheckboxState(mt.ID, "delete");
+    });
 
     const datePicker = document.createElement("INPUT");
     datePicker.classList.add("ms-date");
@@ -260,6 +284,12 @@ function CreateOneRow(mt) {
     timePicker.setAttribute("type", "time");
     timePicker.value = mt.Time;
     AddSaveFieldEventListener(timePicker, "Time", null, mt.ID);
+    timePicker.addEventListener("change", () => {
+        //If the time changes and there is a cancellation in progress, reset that field and those values beacuse they are possibly no longer accurate
+        //Admittedly, it's pretty hard for the time changing to make that a possibility, but it is possible
+        ResetCheckboxState(mt.ID, "cancel");
+        ResetCheckboxState(mt.ID, "delete");
+    });
 
     time.appendChild(frequencyDropdown);
     
@@ -280,7 +310,6 @@ function CreateOneRow(mt) {
     
     const cancel = document.createElement("TD");
     GenerateCheckboxLabelAndDropdown(cancel, mt, "cancel", "Cancel", "CancelledUntil", "Indefinitely", 10, "CancelleddUntil", frequencyDropdown);
-    // TODO translate "mt.CancelledUntil" into the proper UI here, and back again
 
     row.appendChild(cancel);
 
@@ -289,6 +318,7 @@ function CreateOneRow(mt) {
     additionalNotesInput.classList.add("ms-additional-notes");
     additionalNotesInput.setAttribute("type", "text");
     additionalNotesInput.value = mt.AdditionalNotes;
+    AddSaveFieldEventListener(additionalNotesInput, "AdditionalNotes", null, mt.ID);
     additionalNotes.appendChild(additionalNotesInput);
 
     row.appendChild(additionalNotes);
@@ -296,7 +326,6 @@ function CreateOneRow(mt) {
     const _delete = document.createElement("TD");
     GenerateCheckboxLabelAndDropdown(_delete, mt, "delete", "Delete", "DeletedUntil", "Permanently", 10, "DeletedUntil", frequencyDropdown);
 
-    // TODO translate "mt.DeletedUtil" into the proper UI here, and back again
     row.appendChild(_delete);
 
     const saveState = document.createElement("TD");
@@ -321,6 +350,9 @@ function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText,
             document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", undefined);
         }
     });
+    if(mt[fieldName] !== undefined) {
+        checkbox.setAttribute("checked", undefined);
+    }
     parent.appendChild(checkbox);
     AddSaveFieldEventListener(checkbox, fieldName, () => {
         if(checkbox.checked) {
@@ -341,35 +373,44 @@ function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText,
     optionOne.innerText = firstDropdownText;
     optionOne.value = "-1";
     lengthDropdown.appendChild(optionOne);
+    const nextOccuranceNumber = UntilDateToNumOccurances(mt.ID, fieldName);
     for(var i = 1; i <= numOtherOptions; i++) {
         const nextOption = document.createElement("OPTION");
         nextOption.innerText = `Next ${i} occurance` + (i > 1 ? "s" : "");
         nextOption.value = `${i}`;
+        if(nextOccuranceNumber === i) {
+            nextOption.setAttribute("selected", undefined);
+            lengthDropdown.removeAttribute("disabled");
+        }
         lengthDropdown.appendChild(nextOption);
     }
+
     frequencyDropdown.addEventListener("change", (e) => {
         if(e.target.value === Frequency.OneTime) {
             document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).style.display = "none";
         } else {
             document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).style.display = "inline-block";
         }
+        
+        //If the frequency changes and there is a cancellation in progress, reset that field and those values beacuse they are no longer accurate
+        ResetCheckboxState(mt.ID, slugForClasses);
     });
     if(mt.Frequency === Frequency.OneTime) {
         lengthDropdown.style.display = "none";
-    }
-
-    if(mt[jsonField] !== undefined) {
-        const dateDiff = mt[jsonField] - new Date();
-        const daysAway = dateDiff / (1000 * 60 * 60 * 24);
-        if(daysAway > 0) {
-            lengthDropdown.value = `${Math.ceil(daysAway / 7)}`;
-        }
     }
 
     parent.appendChild(lengthDropdown);
     AddSaveFieldEventListener(lengthDropdown, fieldName, () => {
         return NumOccurancesToUntilDate(document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).value, mt.ID);
     }, mt.ID);
+}
+
+function ResetCheckboxState(ID, slugForClasses) {
+    if(document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}`).checked) {
+        document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}`).checked = false;
+        document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}-dropdown`).value = "-1";
+        document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", undefined);
+    }
 }
 
 function NumOccurancesToUntilDate(numOccurances, ID) {
@@ -383,7 +424,17 @@ function NumOccurancesToUntilDate(numOccurances, ID) {
             overshoot = new Date(overshoot - (1000 * 60 * 60 * 24));
             safety--;
         }
-        return overshoot;
+        return new Date(overshoot.toISOString().split("T")[0]); //overshoot without the time component
+    }
+}
+
+function UntilDateToNumOccurances(ID, fieldName) {
+    const untilDate = MassTimesUpdates.filter(m => m.ID === ID)[0][fieldName];
+    if(untilDate) {
+        const diff = (new Date(untilDate) - new Date());
+        return Math.ceil((diff / (1000 * 60 * 60 * 24)) / 7);
+    } else {
+        return undefined;
     }
 }
 
@@ -392,16 +443,25 @@ function InitializePreview() {
 }
 
 // Saves whatever is currently in the raw JSON textarea element
-function SaveMassTimes() {
-    PurgeStaleMassTimes();
+function SaveAddMassTime(e) {
     if(ValidateNewMassTimesObject()) {
-        document.querySelector("#submit")?.click();
+        document.querySelector("#ms-add-form").submit();
     }
 }
 
 // Remove mass times that have been permanently deleted or one-time mass times whos date has passed
-function PurgeStaleMassTimes() {
-    //TODO
+function PurgeStaleMassTimes(jsonToPurgeFrom) {
+    const idsToPurge = [];
+    jsonToPurgeFrom.forEach(mt => {
+        if(mt.DeletedUntil === null) {
+            idsToPurge.push(mt.ID);
+        }
+        if(mt.Frequency === Frequency.OneTime && new Date(`${mt.Date} ${mt.Time}`) < new Date()) {
+            idsToPurge.push(mt.ID);
+        }
+    });
+
+    return jsonToPurgeFrom.filter(mt => !idsToPurge.includes(mt.ID));
 }
 
 // Validation Rules
@@ -409,12 +469,13 @@ function PurgeStaleMassTimes() {
 // - No times in the past (only applies if the date is today)
 // - No 2 mass times at the same exact time (regardless of frequency, so you'll need to calculate)
 //   - Unless one of those 2 masses are either cancelled or deleted
-function ValidateNewMassTimesObject() {
-    const frequencyField = document.querySelector("#ms-frequency");
-    const dayField = document.querySelector("#ms-day-of-week");
-    const dateField = document.querySelector("#ms-date");
-    const timeField = document.querySelector("#ms-time");
-    const notesField = document.querySelector("#ms-additional-notes");
+function ValidateNewMassTimesObject(ID) {
+    const selectorPrefix = ID ? `#ms-row-${ID} .` : "#";
+    const frequencyField = document.querySelector(selectorPrefix + "ms-frequency");
+    const dayField = document.querySelector(selectorPrefix + "ms-day-of-week");
+    const dateField = document.querySelector(selectorPrefix + "ms-date");
+    const timeField = document.querySelector(selectorPrefix + "ms-time");
+    const notesField = document.querySelector(selectorPrefix + "ms-additional-notes");
 
     const allFields = [ frequencyField, dayField, dateField, timeField, notesField ];
     allFields.forEach(f => f.setCustomValidity("")); //reset validation
@@ -452,27 +513,15 @@ function ValidateNewMassTimesObject() {
     }
 
     allFields.forEach(f => {
-        f.checkVisibility();
         console.log({ f, valid: f.reportValidity() });
     });
 
     return !allFields.some(f => !f.reportValidity());
 }
 
-
-function LoadMassTimeObject(rawJson) {
-    SyncFrontend();
+if(document.querySelector("#ms-json-add")) {
+    LoadRawJson();
+    InitializeAddMassTimeForm();
+    InitializeEditMassTimeFormTable();
+    InitializePreview();
 }
-
-function SyncFrontend() {
-    
-}
-
-function CalculateJson() {
-    const output = document.getElementsByName("spc_masstimes_json");
-}
-
-LoadRawJson();
-InitializeAddMassTimeForm();
-InitializeEditMassTimeFormTable();
-InitializePreview();

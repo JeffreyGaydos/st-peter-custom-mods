@@ -35,7 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.4');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.6');
     wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.1');
 }
 
@@ -56,60 +56,78 @@ if( !function_exists("spc_acp_page") ) {
             ?>
             <h2>Custom Slider</h2>
             <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
-            <h2>Mass Schedule</h2>
-            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
-            <textarea type="text" name="spc_masstimes_json" id="ms-json" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
-            <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
-            <h4 id="ms-add-loading-indicator">Loading...</h4>
-            <fieldset id="ms-add-time-fs" style="display: none">
-                <legend>Add a New Mass Time</legend>
-                <label for="ms-frequency">Frequency: </label>
-                <select id="ms-frequency" class="ms-frequency" disabled>
-                    <option style="display: none" value="-1" disabled selected>Select Mass frequency...</option>
-                </select>
-                <br/>
-                <label for="ms-day-of-week">Day of Week</label>
-                <select id="ms-day-of-week" class="ms-day-of-week" disabled>
-                    <option style="display: none" value="-1" disabled selected>Select a day...</option>
-                </select>
-                <br/>
-                <label for="ms-date">Date</label>
-                <input type="date" id="ms-date" class="ms-date" disabled>
-                <br/>
-                <label for="ms-time">Time of Day</label>
-                <input type="time" id="ms-time" disabled>
-                <br/>
-                <label for="ms-additional-notes">Additional Notes</label>
-                <input type="text" id="ms-additional-notes" disabled/>
-                <span style="font-style: italic">(HTML code Supported)</span>
-                <br/>
-                <br/>
-                <button id="ms-add-button" class="button button-primary" disabled>Add this Mass Time</button>
-            </fieldset>
-            <div>
-                <h3>Current Configured Mass Times</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Cancel</th>
-                            <th>Additional Notes</th>
-                            <th>Delete</th>
-                            <th>Is Actually Saved</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ms-tbody">
-                        <h4 id="ms-existing-loading-indicator">Loading...</h4>
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                <h3>Mass Times Preview:</h3>
-            </div>
-
             <?php
                 submit_button();
             ?>
+            </form>
+            <form id="ms-add-form" method="post" action="options.php">
+                <?php
+                    settings_fields( 'spc-settings' );
+                ?>
+                <?php
+                    do_settings_sections( 'spc-settings' );
+                ?>
+                <h2>Mass Schedule</h2>
+                <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+                <textarea type="text" name="spc_masstimes_json" id="ms-json-add" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
+                <p>Use the dropdowns to set a mass schedule to display. The current mass schedule is listed below the dropdowns. Click the cancel checkbox on a specific mass time to cancel the mass time just for this week. Click the x button on a specific mass time to remove it forever.</p>
+                <h4 id="ms-add-loading-indicator">Loading...</h4>
+            
+                <fieldset id="ms-add-time-fs" style="display: none">
+                    <legend>Add a New Mass Time</legend>
+                    <label for="ms-frequency">Frequency: </label>
+                    <select id="ms-frequency" class="ms-frequency" disabled>
+                        <option style="display: none" value="-1" disabled selected>Select Mass frequency...</option>
+                    </select>
+                    <br/>
+                    <label for="ms-day-of-week">Day of Week</label>
+                    <select id="ms-day-of-week" class="ms-day-of-week" disabled>
+                        <option style="display: none" value="-1" disabled selected>Select a day...</option>
+                    </select>
+                    <br/>
+                    <label for="ms-date">Date</label>
+                    <input type="date" id="ms-date" class="ms-date" disabled>
+                    <br/>
+                    <label for="ms-time">Time of Day</label>
+                    <input type="time" id="ms-time" disabled>
+                    <br/>
+                    <label for="ms-additional-notes">Additional Notes</label>
+                    <input type="text" id="ms-additional-notes" disabled/>
+                    <span style="font-style: italic">(HTML code Supported)</span>
+                    <br/>
+                    <br/>
+                    <input type="submit" id="ms-add-button" class="button button-primary" value="Add this Mass Time" disabled />
+                </fieldset>
+            </form>
+            <form id="ms-edit-form" method="post" action="options.php">
+                <?php
+                    settings_fields( 'spc-settings' );
+                ?>
+                <?php
+                    do_settings_sections( 'spc-settings' );
+                ?>
+                <textarea type="text" name="spc_masstimes_json" id="ms-json-edit" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
+                <div>
+                    <h3>Current Configured Mass Times</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Cancel</th>
+                                <th>Additional Notes</th>
+                                <th>Delete</th>
+                                <th>Is Actually Saved</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ms-tbody">
+                            <h4 id="ms-existing-loading-indicator">Loading...</h4>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3>Mass Times Preview:</h3>
+                </div>
+                <input type="submit" class="button button-primary" id="ms-edit-button" value="Save Edits" disabled />
             </form>
         </div>
         <?php
