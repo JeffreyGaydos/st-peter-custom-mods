@@ -23,7 +23,10 @@ if(get_option('spc_masstimes') == 'on') {
 
 if( !function_exists("spc_masstimes") ) {
     function spc_masstimes() {
-        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.1');
+        if(is_singular()) {
+            ?><div id="spc_masstimes_json" style="display: none"><?=get_option('spc_masstimes_json')?></div><?php
+        }
+        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.2');
     }
 }
 
@@ -36,6 +39,6 @@ if(get_option('spc_slider') == 'on') {
 
 if( !function_exists("spc_slider") ) {
     function spc_slider() {
-        wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.0');
+        wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.1');
     }
 }

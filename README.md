@@ -1,5 +1,5 @@
 # St. Peter Custom Mods
-## st-peter-custom-mods | Current Version: 0.0.2
+## st-peter-custom-mods | Current Version: 0.0.3
 
 Plugin Name: St. Peter Custom Mods
 

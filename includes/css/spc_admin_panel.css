@@ -1,0 +1,47 @@
+.sp-admin-panel {
+    td {
+        border: 1px solid black;
+        padding-inline: 10px;
+        margin: 0;
+    }
+
+    td.s {
+        color: green;
+    }
+
+    td.p {
+        background-color: orange;
+        font-weight: 600;
+    }
+
+    fieldset {
+        border-width: 2px;
+        border-style: groove;
+        padding-block: 0.35em 0.625em;
+        padding-inline: 0.75em;
+
+        legend {
+            font-weight: 600;
+            font-size: large;
+        }
+    }
+
+    .ms-order {
+        button {
+            font-size: 20px;
+        }
+    }
+
+    #ms-preview-window {
+        width: min(500px, 100%);
+        min-height: 200px;
+        box-shadow: 0px 0px 5px black;
+        padding: 10px;
+        background-color: white;
+
+        ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+    }
+}
