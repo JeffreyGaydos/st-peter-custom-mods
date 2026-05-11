@@ -31,7 +31,7 @@ def stop(success):
 ###########################################################################################
 
 regInclude = ["(?<!\.orig)\.js$", "(?<!\.orig)\.css$", "(?<!\.orig)\.png$", "(?<!\.orig)\.svg$", "(?<!\.orig)\.php$", "(?<!\.orig)\.jpg$" ]
-fileExclude = ["additional.css"]
+fileExclude = ["additional.css", "st-peter-custom-mods.zip"]
 
 def zip_files(directory):
     with zipfile.ZipFile('st-peter-custom-mods.zip', 'w') as zipf:
