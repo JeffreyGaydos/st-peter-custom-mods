@@ -35,6 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
+    wp_enqueue_script( 'spc-masstimes', plugins_url('/includes/js/spc_masstimes.js', __FILE__), '', '1.0');
     wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.8');
     wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.2');
 }
@@ -139,7 +140,10 @@ if( !function_exists("spc_acp_page") ) {
                 <input type="submit" class="button button-primary" id="ms-edit-button" value="Save Edits" disabled />
                 <div>
                     <h3>Mass Times Preview:</h3>
-                    <div id="ms-preview-window"></div>
+                    <div id="ms-preview-window">
+                        <h3>Mass Times:</h3>
+                        <spc_mass_times></spc_mass_times>
+                    </div>
                 </div>
                 <br />
                 <br />

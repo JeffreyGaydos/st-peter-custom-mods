@@ -1,10 +1,5 @@
 console.log("spc_admin_panel.js");
 
-const Frequency = {
-    Weekly: "Weekly",
-    OneTime: "One Time"
-}
-
 const Day = {
     Sunday: "Sunday",
     Monday: "Monday",
@@ -516,51 +511,11 @@ function InitializePreview() {
     RenderPreview(MassTimes);
 }
 
-function RenderPreview(json) {
-    const purgedJson = PurgeStaleMassTimes(json);
-    const preview = document.querySelector("#ms-preview-window");
-    preview.innerHTML = ""; //clear any previous render
-    if(purgedJson.length > 0) {
-        const title = document.createElement("H2");
-        title.innerText = "Mass Times:";
-        preview.appendChild(title);
-        const listP = document.createElement("UL");
-        for(var i = 0; i < purgedJson.length; i++) {
-            const listE = document.createElement("LI");
-            const frequencyDay = purgedJson[i].Frequency === Frequency.Weekly ? `Every ${purgedJson[i].Day}` : `${purgedJson[i].Date}`
-            const timeString = purgedJson[i].Time.split(":")[0] > 12 ? `${purgedJson[i].Time.split(":")[0] - 12}:${purgedJson[i].Time.split(":")[1]} PM` : `${purgedJson[i].Time} AM`
-            const isCancelled = purgedJson[i].CancelledUntil ? new Date() < new Date(new Date(purgedJson[i].CancelledUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].CancelledUntil === null;
-            const isDeleted = purgedJson[i].DeletedUntil ? new Date() < new Date(new Date(purgedJson[i].DeletedUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].DeletedUntil === null;
-            const cancelStartString = isCancelled ? '<span style="text-decoration: line-through">' : '';
-            const cancelEndString = isCancelled ? '</span><span style="font-weight: 600; color: red"> CANCELLED</span>' : '';
-            listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`
-            if(!isDeleted)
-                listP.appendChild(listE);
-        }
-        preview.appendChild(listP);
-    }
-}
-
 // Saves whatever is currently in the raw JSON textarea element
 function SaveAddMassTime(e) {
     if(ValidateNewMassTimesObject()) {
         document.querySelector("#ms-add-form").submit();
     }
-}
-
-// Remove mass times that have been permanently deleted or one-time mass times whos date has passed
-function PurgeStaleMassTimes(jsonToPurgeFrom) {
-    const idsToPurge = [];
-    jsonToPurgeFrom.forEach(mt => {
-        if(mt.DeletedUntil === null) {
-            idsToPurge.push(mt.ID);
-        }
-        if(mt.Frequency === Frequency.OneTime && new Date(`${mt.Date} ${mt.Time}`) < new Date()) {
-            idsToPurge.push(mt.ID);
-        }
-    });
-
-    return jsonToPurgeFrom.filter(mt => !idsToPurge.includes(mt.ID));
 }
 
 // Validation Rules
