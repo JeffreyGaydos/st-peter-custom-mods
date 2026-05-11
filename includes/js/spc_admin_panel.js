@@ -196,6 +196,8 @@ function InitializeEditMassTimeFormTable() {
 
     if(MassTimes.length == 0) {
         document.querySelector("#ms-existing-loading-indicator").innerText = "None yet!";
+        document.querySelector("table:has(#ms-tbody)").style.display = "none";
+        document.querySelector("#ms-edit-button").setAttribute("disabled", undefined);
     } else {
         document.querySelector("#ms-existing-loading-indicator").remove();
     }
