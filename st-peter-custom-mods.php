@@ -35,7 +35,7 @@ function spc_settings_menu() {
 }
 
 function load_admin_scripts( $hook ) {
-    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.7');
+    wp_enqueue_script( 'spc-admin-panel', plugins_url('/includes/js/spc_admin_panel.js', __FILE__), '', '1.8');
     wp_enqueue_style( 'spc-admin-panel-css', plugins_url('/includes/css/spc_admin_panel.css', __FILE__), '', '1.2');
 }
 
@@ -56,6 +56,9 @@ if( !function_exists("spc_acp_page") ) {
             ?>
             <h2>Custom Slider</h2>
             <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+            <h2>Mass Schedule</h2>
+            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+            <textarea type="text" name="spc_masstimes_json" id="ms-json-constant" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
             <?php
                 submit_button();
             ?>
@@ -67,8 +70,11 @@ if( !function_exists("spc_acp_page") ) {
                 <?php
                     do_settings_sections( 'spc-settings' );
                 ?>
-                <h2>Mass Schedule</h2>
-                <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+                <!-- Each form in WordPress has to have ALL settings in it, so if you want to have multiple forms, you must include each "oroginal" setting in that form, which is what we've done with these hidden inputs. Consider if breaking this up into multiple sidebar admin pannels would be easier-->
+                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+
+                <h2>Mass Schedule Configuration</h2>
                 <textarea type="text" name="spc_masstimes_json" id="ms-json-add" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
                 <p>
                     <a href="https://github.com/JeffreyGaydos/st-peter-custom-mods/blob/main/MassTimesReadme.md">Help / Instructions</a>
@@ -108,6 +114,9 @@ if( !function_exists("spc_acp_page") ) {
                 <?php
                     do_settings_sections( 'spc-settings' );
                 ?>
+                <!-- Each form in WordPress has to have ALL settings in it, so if you want to have multiple forms, you must include each "oroginal" setting in that form, which is what we've done with these hidden inputs. Consider if breaking this up into multiple sidebar admin pannels would be easier-->
+                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
                 <textarea type="text" name="spc_masstimes_json" id="ms-json-edit" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
                 <div>
                     <h3>Current Configured Mass Times</h3>
