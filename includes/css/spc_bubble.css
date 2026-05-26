@@ -1,0 +1,68 @@
+#mass-times-bubble {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    border-radius: 10px;
+    height: 38px;
+    background-color: var(--sp-brown);
+    display: flex;
+    padding-inline: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+    margin-bottom: 0;
+    transition: all ease 0.2s;
+
+    * {
+        margin-block: auto;
+    }
+
+    span {
+        pointer-events: none;
+        color: white;
+    }
+
+    img {
+        background-color: white;
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        
+    }
+    img#e-icon {
+        mask-image: url(EucharistIcon.png);
+        margin-right: -20px;
+    }
+
+    img#c-icon {
+        transition: all ease 0.2s;
+        transform: scale(1.35);
+        width: 22px;
+        height: 22px;
+        mask-image: url(Border.png);
+        background-color: var(--lc-gold);
+    }
+
+    img#c-icon:hover {
+        background-color: white;
+    }
+}
+
+
+#mass-times-bubble.hovered {
+    img#c-icon {
+        transform: scale(1.5);
+    }
+}
+
+@media (min-width: 400px) {
+    #mass-times-bubble {
+        br {
+            display: none;
+        }
+    }   
+}
+
+@media (max-width: 400px) {
+    #mass-times-bubble {
+        height: 58px;
+    }   
+}

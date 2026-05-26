@@ -42,3 +42,16 @@ if( !function_exists("spc_slider") ) {
         wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.1');
     }
 }
+
+/********************************************************************
+ * Routing Mass Time Bubble
+ ********************************************************************/
+if(get_option('spc_bubble') == 'on') {
+    add_action("wp_head", "spc_bubble", 10);
+}
+
+if( !function_exists("spc_bubble") ) {
+    function spc_bubble() {
+        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.60');
+    }
+}

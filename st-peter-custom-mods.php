@@ -56,9 +56,11 @@ if( !function_exists("spc_acp_page") ) {
                 do_settings_sections( 'spc-settings' );
             ?>
             <h2>Custom Slider</h2>
-            <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+            <input type="checkbox" name="spc_slider" <?php spc_get_checked('spc_slider') ?> ><span>Turn On/Off Custom Slider</span></input>
             <h2>Mass Schedule</h2>
-            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
+            <input type="checkbox" name="spc_masstimes" <?php spc_get_checked('spc_masstimes') ?> ><span>Turn On/Off Mass Schedule System</span></input>
+            <h2>Mass Times Bubble</h2>
+            <input type="checkbox" name="spc_bubble" <?php spc_get_checked('spc_bubble') ?> ><span>Turn On/Off Mass Times Bubble</span></input>
             <textarea type="text" name="spc_masstimes_json" id="ms-json-constant" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
             <?php
                 submit_button();
@@ -72,8 +74,9 @@ if( !function_exists("spc_acp_page") ) {
                     do_settings_sections( 'spc-settings' );
                 ?>
                 <!-- Each form in WordPress has to have ALL settings in it, so if you want to have multiple forms, you must include each "oroginal" setting in that form, which is what we've done with these hidden inputs. Consider if breaking this up into multiple sidebar admin pannels would be easier-->
-                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
-                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> ><span style="display: none">Turn On/Off Mass Schedule System</span></input>
+                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> ><span style="display: none">Turn On/Off Custom Slider</span></input>
+                <input type="checkbox" name="spc_bubble" style="display: none;" <?php spc_get_checked('spc_bubble') ?> ><span style="display: none">Turn On/Off Mass Times Bubble</span></input>
 
                 <h2>Mass Schedule Configuration</h2>
                 <textarea type="text" name="spc_masstimes_json" id="ms-json-add" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
@@ -116,8 +119,9 @@ if( !function_exists("spc_acp_page") ) {
                     do_settings_sections( 'spc-settings' );
                 ?>
                 <!-- Each form in WordPress has to have ALL settings in it, so if you want to have multiple forms, you must include each "oroginal" setting in that form, which is what we've done with these hidden inputs. Consider if breaking this up into multiple sidebar admin pannels would be easier-->
-                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> >Turn On/Off Mass Schedule System</input>
-                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> >Turn On/Off Custom Slider</input>
+                <input type="checkbox" name="spc_masstimes" style="display: none;" <?php spc_get_checked('spc_masstimes') ?> ><span style="display: none">Turn On/Off Mass Schedule System</span></input>
+                <input type="checkbox" name="spc_slider" style="display: none;" <?php spc_get_checked('spc_slider') ?> ><span style="display: none">Turn On/Off Custom Slider</span></input>
+                <input type="checkbox" name="spc_bubble" style="display: none;" <?php spc_get_checked('spc_bubble') ?> ><span style="display: none">Turn On/Off Mass Times Bubble</span></input>
                 <textarea type="text" name="spc_masstimes_json" id="ms-json-edit" style="display: none"><?php echo spc_get_text('spc_masstimes_json'); ?></textarea>
                 <div>
                     <h3>Current Configured Mass Times</h3>
@@ -187,5 +191,6 @@ if( !function_exists("update_spc_info") ) {
         register_setting( 'spc-settings', 'spc_masstimes' );
         register_setting( 'spc-settings', 'spc_masstimes_json');
         register_setting( 'spc-settings', 'spc_slider' );
+        register_setting( 'spc-settings', 'spc_bubble' );
     }
 }
