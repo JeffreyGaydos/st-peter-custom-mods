@@ -5,7 +5,7 @@ console.log("Bubble");
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.43";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.65";
         style.id = "spc_bubble_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -34,6 +34,67 @@ console.log("Bubble");
         document.body.appendChild(bubble);
     }
 
+    function createModal() {
+        var dialogWrapper = document.createElement("DIV");
+        dialogWrapper.role = "dialog";
+        dialogWrapper.id = "mass-times-modal";
+        var documentWrapper = document.createElement("DIV");
+        documentWrapper.role = "document";
+        var curtain = document.createElement("DIV");
+        curtain.classList.add("curtain");
+        var content = document.createElement("DIV");
+        content.classList.add("content");
+        var contentTitle = document.createElement("DIV");
+        contentTitle.classList.add("title");
+        contentTitle.innerText = "Mass Times & Directions"
+        var xButton = document.createElement("BUTTON");
+        xButton.innerHTML = "&Cross;"
+        contentTitle.appendChild(xButton);
+        var contentFlex = document.createElement("DIV");
+        contentFlex.classList.add("spc-two-column-parent");
+        var contentLeft = document.createElement("DIV");
+        contentLeft.classList.add("spc-two-column-child");
+        var contentLeftTitle = document.createElement("H3");
+        contentLeftTitle.innerText = "Mass Schedule";
+        var massTimesElement = document.createElement("spc_mass_times");
+        contentLeft.appendChild(contentLeftTitle);
+        contentLeft.appendChild(massTimesElement);
+        var contentRight = document.createElement("DIV");
+        contentRight.classList.add("spc-two-column-child");
+        var contentRightTitle = document.createElement("H3");
+        contentRightTitle.innerText = "Location & Directions";
+        var contentRightLink = document.createElement("A");
+        contentRightLink.setAttribute("href", "https://www.google.com/maps/place/St.+Peter+Catholic+Church/@41.5052582,-81.6829669,17.5z/data=!4m6!3m5!1s0x8830fa7b47b55fcd:0x245ee5e49c55ae4d!8m2!3d41.5055112!4d-81.6811127!16s%2Fm%2F0nhk152?entry=ttu&g_ep=EgoyMDI2MDQxNS4wIKXMDSoASAFQAw%3D%3D");
+        contentRightLink.title = "Open in Google Maps";
+        contentRightLink.classList.add("hover-scale");
+        contentRightLink.style.display = "inline-block";
+        contentRightLink.style.marginTop = "-20px";
+        contentRightLink.style.height = "380px";
+        var contentRightImage = document.createElement("IMG");
+        contentRightImage.src = "/wp-content/plugins/st-peter-custom-mods/images/MapLocation.png"
+        contentRightImage.style.maxHeight = "350px";
+        contentRightImage.alt = "Google Maps view of St. Peter Parish";
+        var contentRightHint = document.createElement("P");
+        contentRightHint.innerText = "Click the above image to see directions on Google Maps";
+        contentRight.appendChild(contentRightTitle);
+        contentRightLink.appendChild(contentRightImage);
+        contentRight.appendChild(contentRightLink);
+        contentRight.appendChild(contentRightHint);
+
+        content.appendChild(contentTitle);
+        contentFlex.appendChild(contentLeft);
+        contentFlex.appendChild(contentRight);
+        content.appendChild(contentFlex);
+        documentWrapper.appendChild(curtain);
+        documentWrapper.appendChild(content);
+        dialogWrapper.appendChild(documentWrapper);
+
+        document.body.appendChild(dialogWrapper);
+
+        RefreshAllMassTimePreviews();
+    }
+
     injectCss();
     createBubble();
+    createModal();
 }
