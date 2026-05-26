@@ -5,7 +5,7 @@ console.log("Bubble");
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.66";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.68";
         style.id = "spc_bubble_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -24,6 +24,7 @@ console.log("Bubble");
         bubble.addEventListener("click", () => {
             showModal();
         });
+        bubble.ariaLabel = "Open mass times & directions modal";
         var iconE = document.createElement("IMG");
         iconE.id = "e-icon";
         var iconC = document.createElement("IMG");
@@ -41,6 +42,7 @@ console.log("Bubble");
         var dialogWrapper = document.createElement("DIV");
         dialogWrapper.role = "dialog";
         dialogWrapper.id = "mass-times-modal";
+        dialogWrapper.classList.add("hide");
         var documentWrapper = document.createElement("DIV");
         documentWrapper.role = "document";
         var curtain = document.createElement("DIV");
@@ -55,6 +57,7 @@ console.log("Bubble");
         contentTitle.innerText = "Mass Times & Directions"
         var xButton = document.createElement("BUTTON");
         xButton.innerHTML = "&Cross;"
+        xButton.ariaLabel = "close modal";
         xButton.addEventListener("click", () => {
             hideModal();
         });
@@ -105,10 +108,34 @@ console.log("Bubble");
 
     function showModal() {
         spc_safe_remove_class(document.querySelector("#mass-times-modal"), "hide");
+        document.addEventListener("keydown", HandleFinalElementTabLoop);
+        document.addEventListener("keydown", HandleFirstElementTabLoop);
+        document.querySelector("#mass-times-modal .title button")?.focus();
     }
 
     function hideModal() {
         document.querySelector("#mass-times-modal").classList.add("hide");
+        document.removeEventListener("keydown", HandleFinalElementTabLoop);
+        document.removeEventListener("keydown", HandleFirstElementTabLoop);
+        document.querySelector("#mass-times-bubble")?.focus();
+    }
+
+    function HandleFinalElementTabLoop(e) {
+        if(document.activeElement === document.querySelector("#mass-times-modal a")) {
+            if(e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                document.querySelector("#mass-times-modal .title button")?.focus();
+            }
+        }
+    }
+
+    function HandleFirstElementTabLoop(e) {
+        if(document.activeElement === document.querySelector("#mass-times-modal .title button")) {
+            if(e.key === 'Tab' && e.shiftKey) {
+                e.preventDefault();
+                document.querySelector("#mass-times-modal a")?.focus();
+            }
+        }
     }
 
     injectCss();
