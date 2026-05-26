@@ -5,7 +5,7 @@ console.log("Bubble");
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.65";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.66";
         style.id = "spc_bubble_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -20,7 +20,10 @@ console.log("Bubble");
         });
         bubble.addEventListener("mouseout", (e) => {
             e.target.classList.remove("hovered");
-        })
+        });
+        bubble.addEventListener("click", () => {
+            showModal();
+        });
         var iconE = document.createElement("IMG");
         iconE.id = "e-icon";
         var iconC = document.createElement("IMG");
@@ -42,6 +45,9 @@ console.log("Bubble");
         documentWrapper.role = "document";
         var curtain = document.createElement("DIV");
         curtain.classList.add("curtain");
+        curtain.addEventListener("click", () => {
+            hideModal();
+        });
         var content = document.createElement("DIV");
         content.classList.add("content");
         var contentTitle = document.createElement("DIV");
@@ -49,6 +55,9 @@ console.log("Bubble");
         contentTitle.innerText = "Mass Times & Directions"
         var xButton = document.createElement("BUTTON");
         xButton.innerHTML = "&Cross;"
+        xButton.addEventListener("click", () => {
+            hideModal();
+        });
         contentTitle.appendChild(xButton);
         var contentFlex = document.createElement("DIV");
         contentFlex.classList.add("spc-two-column-parent");
@@ -92,6 +101,14 @@ console.log("Bubble");
         document.body.appendChild(dialogWrapper);
 
         RefreshAllMassTimePreviews();
+    }
+
+    function showModal() {
+        spc_safe_remove_class(document.querySelector("#mass-times-modal"), "hide");
+    }
+
+    function hideModal() {
+        document.querySelector("#mass-times-modal").classList.add("hide");
     }
 
     injectCss();
