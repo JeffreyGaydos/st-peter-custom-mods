@@ -5,7 +5,7 @@ console.log("Bubble");
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.68";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.81";
         style.id = "spc_bubble_styles";
         style.blocking = "render";
         document.head.appendChild(style);
@@ -81,7 +81,7 @@ console.log("Bubble");
         contentRightLink.classList.add("hover-scale");
         contentRightLink.style.display = "inline-block";
         contentRightLink.style.marginTop = "-20px";
-        contentRightLink.style.height = "380px";
+        contentRightLink.style.maxHeight = "380px";
         var contentRightImage = document.createElement("IMG");
         contentRightImage.src = "/wp-content/plugins/st-peter-custom-mods/images/MapLocation.png"
         contentRightImage.style.maxHeight = "350px";
@@ -110,6 +110,7 @@ console.log("Bubble");
         spc_safe_remove_class(document.querySelector("#mass-times-modal"), "hide");
         document.addEventListener("keydown", HandleFinalElementTabLoop);
         document.addEventListener("keydown", HandleFirstElementTabLoop);
+        disableScroll();
         document.querySelector("#mass-times-modal .title button")?.focus();
     }
 
@@ -117,6 +118,7 @@ console.log("Bubble");
         document.querySelector("#mass-times-modal").classList.add("hide");
         document.removeEventListener("keydown", HandleFinalElementTabLoop);
         document.removeEventListener("keydown", HandleFirstElementTabLoop);
+        enableScroll();
         document.querySelector("#mass-times-bubble")?.focus();
     }
 
@@ -137,6 +139,69 @@ console.log("Bubble");
             }
         }
     }
+
+// Begin Stack overflow code to disable scroll
+    // left: 37, up: 38, right: 39, down: 40,
+    // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+    var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+    function preventDefault(e) {
+        console.log(e.target.id);
+        e.preventDefault();
+    }
+
+    function preventDefaultForScrollKeys(e) {
+        if (keys[e.keyCode]) {
+            preventDefault(e);
+            return false;
+        }
+    }
+
+    // modern Chrome requires { passive: false } when adding event
+    var supportsPassive = false;
+    try {
+        window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
+            get: function () { supportsPassive = true; } 
+        }));
+    } catch(e) {}
+
+    var wheelOpt = supportsPassive ? { passive: false } : false;
+    var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+
+    function stopPropagation(e) {
+        e.stopPropagation();
+    }
+
+    // call this to Disable
+    function disableScroll() {
+        window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
+        window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+        window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
+        window.addEventListener('keydown', preventDefaultForScrollKeys, false);
+
+        //But don't use the above events for the modal's content
+        const modal = document.querySelector("#mass-times-modal .content");
+        modal.addEventListener('DOMMouseScroll', stopPropagation, false); // older FF
+        modal.addEventListener(wheelEvent, stopPropagation, wheelOpt); // modern desktop
+        modal.addEventListener('touchmove', stopPropagation, wheelOpt); // mobile
+        modal.addEventListener('keydown', stopPropagation, false);
+    }
+
+    // call this to Enable
+    function enableScroll() {
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+        window.removeEventListener(wheelEvent, preventDefault, wheelOpt); 
+        window.removeEventListener('touchmove', preventDefault, wheelOpt);
+        window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
+
+        const modal = document.querySelector("#mass-times-modal .content");
+        modal.removeEventListener('DOMMouseScroll', stopPropagation, false); // older FF
+        modal.removeEventListener(wheelEvent, stopPropagation, wheelOpt); // modern desktop
+        modal.removeEventListener('touchmove', stopPropagation, wheelOpt); // mobile
+        modal.removeEventListener('keydown', stopPropagation, false);
+    }
+// End Stack overflow code to disable scroll
+
 
     injectCss();
     createBubble();
