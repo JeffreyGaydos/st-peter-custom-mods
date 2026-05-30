@@ -26,7 +26,7 @@ if( !function_exists("spc_masstimes") ) {
         if(is_singular()) {
             ?><div id="spc_masstimes_json" style="display: none"><?=get_option('spc_masstimes_json')?></div><?php
         }
-        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.2');
+        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.3');
     }
 }
 
@@ -40,5 +40,18 @@ if(get_option('spc_slider') == 'on') {
 if( !function_exists("spc_slider") ) {
     function spc_slider() {
         wp_enqueue_script( 'spc-slider', plugins_url('/js/spc_slider.js', __FILE__), '', '1.1');
+    }
+}
+
+/********************************************************************
+ * Routing Mass Time Bubble
+ ********************************************************************/
+if(get_option('spc_bubble') == 'on') {
+    add_action("wp_head", "spc_bubble", 10);
+}
+
+if( !function_exists("spc_bubble") ) {
+    function spc_bubble() {
+        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.0');
     }
 }
