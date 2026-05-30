@@ -3,7 +3,7 @@
     function injectCss() {
         var style = document.createElement("link");
         style.rel = "stylesheet";
-        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.82";
+        style.href = "/wp-content/plugins/st-peter-custom-mods/includes/css/spc_bubble.css?v1.0";
         style.id = "spc_bubble_styles";
         style.blocking = "render";
         document.head.appendChild(style);
