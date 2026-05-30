@@ -26,7 +26,7 @@ if( !function_exists("spc_masstimes") ) {
         if(is_singular()) {
             ?><div id="spc_masstimes_json" style="display: none"><?=get_option('spc_masstimes_json')?></div><?php
         }
-        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.7');
+        wp_enqueue_script( 'spc-masstimes', plugins_url('/js/spc_masstimes.js', __FILE__), '', '1.3');
     }
 }
 
@@ -52,6 +52,6 @@ if(get_option('spc_bubble') == 'on') {
 
 if( !function_exists("spc_bubble") ) {
     function spc_bubble() {
-        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.180');
+        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.0');
     }
 }
