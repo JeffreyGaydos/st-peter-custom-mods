@@ -52,6 +52,6 @@ if(get_option('spc_bubble') == 'on') {
 
 if( !function_exists("spc_bubble") ) {
     function spc_bubble() {
-        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.178');
+        wp_enqueue_script( 'spc-bubble', plugins_url('/js/spc_bubble.js', __FILE__), '', '1.180');
     }
 }
