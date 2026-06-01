@@ -23,7 +23,7 @@ if(document.querySelector("#sp-slider"))
         slideData.img = {};
         slideData.img.src = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("src");
         slideData.img.srcset = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("srcset");
-        slideData.img.originalSrc = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("src").replace(/-[0-9]{3}x[0-9]{3}/g, "");
+        slideData.img.originalSrc = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("src").replace(/\?resize=[0-9].*/g, "");
         slideData.img.alt = document.querySelector(listSelector + "img.lcp_thumb")?.getAttribute("alt");
 
         if(slideData.img.src === undefined) {
