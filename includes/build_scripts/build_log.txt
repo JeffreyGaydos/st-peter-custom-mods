@@ -24,3 +24,16 @@
 2026-06-01 02:57:19.370520 [build_update_plugin_version.py]: [INFO] Updating README.md...
 2026-06-01 02:57:19.370989 [build_update_plugin_version.py]: [INFO] Updating st-peter-custom-mods.php...
 2026-06-01 02:57:19.371346 [build_update_plugin_version.py]: Completed successfully
+2026-06-01 02:57:20.320127 [build_zip_plugin.py]: st-peter-custom-mods.php
+2026-06-01 02:57:20.322206 [build_zip_plugin.py]: spc-functions.php
+2026-06-01 02:57:20.322364 [build_zip_plugin.py]: spc_admin_panel.js
+2026-06-01 02:57:20.322512 [build_zip_plugin.py]: spc_init.js
+2026-06-01 02:57:20.322628 [build_zip_plugin.py]: spc_masstimes.js
+2026-06-01 02:57:20.322739 [build_zip_plugin.py]: spc_slider.js
+2026-06-01 02:57:20.322891 [build_zip_plugin.py]: spc_bubble.js
+2026-06-01 02:57:20.323042 [build_zip_plugin.py]: spc_slider.css
+2026-06-01 02:57:20.323161 [build_zip_plugin.py]: EucharistIcon.png
+2026-06-01 02:57:20.323262 [build_zip_plugin.py]: spc_admin_panel.css
+2026-06-01 02:57:20.323366 [build_zip_plugin.py]: spc_bubble.css
+2026-06-01 02:57:20.323468 [build_zip_plugin.py]: Border.png
+2026-06-01 02:57:20.323691 [build_zip_plugin.py]: MapLocation.png
