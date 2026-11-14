@@ -419,7 +419,7 @@ function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText,
             document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", undefined);
         }
     });
-    if(mt[fieldName] !== undefined) {
+    if(mt[fieldName] !== undefined && !(fieldName.includes("Until") && new Date(mt[fieldName]) < Date.now())) {
         checkbox.setAttribute("checked", undefined);
     }
     parent.appendChild(checkbox);
