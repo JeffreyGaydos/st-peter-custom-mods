@@ -20,7 +20,7 @@ function RenderPreview(json) {
                     day: "numeric"
                 }) : undefined;
                 const frequencyDay = purgedJson[i].Frequency === Frequency.Weekly ? `Every ${purgedJson[i].Day}` : `${niceDate}`
-                const timeString = purgedJson[i].Time.split(":")[0] > 12 ? `${purgedJson[i].Time.split(":")[0] - 12}:${purgedJson[i].Time.split(":")[1]} PM` : `${purgedJson[i].Time} AM`
+                const timeString = new Date(`2000-01-01 ${purgedJson[i].Time}`).toLocaleTimeString({ hour: "short" }).replace(/:00 (?=[AP]M)/, " ");
                 const isCancelled = purgedJson[i].CancelledUntil ? new Date() < new Date(new Date(purgedJson[i].CancelledUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].CancelledUntil === null;
                 const isDeleted = purgedJson[i].DeletedUntil ? new Date() < new Date(new Date(purgedJson[i].DeletedUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].DeletedUntil === null;
                 const cancelStartString = isCancelled ? '<span style="text-decoration: line-through">' : '';
