@@ -101,7 +101,7 @@ if( !function_exists("spc_acp_page") ) {
                     <input type="date" id="ms-date" class="ms-date" disabled>
                     <br/>
                     <label for="ms-time">Time of Day</label>
-                    <input type="time" id="ms-time" disabled>
+                    <input type="time" id="ms-time" class="ms-time" disabled>
                     <br/>
                     <label for="ms-additional-notes">Additional Notes</label>
                     <input type="text" id="ms-additional-notes" disabled/>
@@ -149,7 +149,6 @@ if( !function_exists("spc_acp_page") ) {
                 <div>
                     <h3>Mass Times Preview:</h3>
                     <div id="ms-preview-window">
-                        <h3>Mass Times:</h3>
                         <spc_mass_times></spc_mass_times>
                     </div>
                 </div>

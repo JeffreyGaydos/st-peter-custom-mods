@@ -23,7 +23,8 @@ function RenderPreview(json) {
                     }
                 }
                 const listE = purgedJson[i].List === false ? document.createElement("P") : document.createElement("LI");
-                const niceDate = purgedJson[i].Frequency === Frequency.OneTime ? new Date(purgedJson[i].Date).toLocaleDateString("en", {
+                // Adding a time component to avoid time-zone conversions resulting in next or previous day issues
+                const niceDate = purgedJson[i].Frequency === Frequency.OneTime ? new Date(purgedJson[i].Date + " 12:00:00").toLocaleDateString("en", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
@@ -35,7 +36,11 @@ function RenderPreview(json) {
                 const isDeleted = purgedJson[i].DeletedUntil ? new Date() < new Date(new Date(purgedJson[i].DeletedUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].DeletedUntil === null;
                 const cancelStartString = isCancelled ? '<span style="text-decoration: line-through">' : '';
                 const cancelEndString = isCancelled ? '</span><span style="font-weight: 600; color: red"> CANCELLED</span>' : '';
-                listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`
+                if(purgedJson[i].Frequency === Frequency.RawText) {
+                    listE.innerHTML = `${purgedJson[i].AdditionalNotes}`;
+                } else {
+                    listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`;
+                }
                 if(!isDeleted) {
                     if(purgedJson[i].List === false) {
                         preview.appendChild(listE);

@@ -75,7 +75,9 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
     const timeID = "ms-time";
     const dayOfWeekSelector = `${commonAncestorSelector} .${dayOfWeekClass}, ${commonAncestorSelector} [for='${dayOfWeekClass}']`;
     const dateSelector = `${commonAncestorSelector} .${dateClass}, ${commonAncestorSelector} [for='${dateClass}']`;
-    const timeSelector = `${commonAncestorSelector} #${timeID}, ${commonAncestorSelector} [for='${timeID}']`;
+    const timeSelector = `${commonAncestorSelector} .${timeID}, ${commonAncestorSelector} [for='${timeID}']`;
+    const cancelSelector = `${commonAncestorSelector} input.ms-cancel`;
+    const deletedDropdownSelector = `${commonAncestorSelector} select.ms-delete-dropdown`;
     if(selectedFrequency === Frequency.Weekly) {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
             e.style.display = "inline-block";
@@ -85,6 +87,13 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
         });
         document.querySelectorAll(timeSelector).forEach(e => {
             e.style.display = "inline-block";
+        });
+        document.querySelectorAll(cancelSelector).forEach(e => {
+            e.removeAttribute("disabled");
+            e.title = "";
+        });
+        document.querySelectorAll(deletedDropdownSelector).forEach(e => {
+            e.title = "";
         });
     } else if(selectedFrequency === Frequency.OneTime) {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
@@ -96,6 +105,13 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
         document.querySelectorAll(timeSelector).forEach(e => {
             e.style.display = "inline-block";
         });
+        document.querySelectorAll(cancelSelector).forEach(e => {
+            e.removeAttribute("disabled");
+            e.title = "";
+        });
+        document.querySelectorAll(deletedDropdownSelector).forEach(e => {
+            e.title = "";
+        });
     } else if(selectedFrequency == Frequency.RawText) {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
             e.style.display = "none";
@@ -106,6 +122,13 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
         document.querySelectorAll(timeSelector).forEach(e => {
             e.style.display = "none";
         });
+        document.querySelectorAll(cancelSelector).forEach(e => {
+            e.setAttribute("disabled", "");
+            e.title = "Not Applicable";
+        });
+        document.querySelectorAll(deletedDropdownSelector).forEach(e => {
+            e.title = "Only permanent deletion is supported for this frequency";
+        });
     } else {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
             e.style.display = "none";
@@ -115,6 +138,13 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
         });
         document.querySelectorAll(timeSelector).forEach(e => {
             e.style.display = "none";
+        });
+        document.querySelectorAll(cancelSelector).forEach(e => {
+            e.removeAttribute("disabled");
+            e.title = "";
+        });
+        document.querySelectorAll(deletedDropdownSelector).forEach(e => {
+            e.title = "";
         });
     }
 }
@@ -218,7 +248,7 @@ function InitializeEditMassTimeFormTable() {
     if(MassTimes.length == 0) {
         document.querySelector("#ms-existing-loading-indicator").innerText = "None yet!";
         document.querySelector("table:has(#ms-tbody)").style.display = "none";
-        document.querySelector("#ms-edit-button").setAttribute("disabled", undefined);
+        document.querySelector("#ms-edit-button").setAttribute("disabled", "");
     } else {
         document.querySelector("#ms-existing-loading-indicator").remove();
     }
@@ -279,7 +309,7 @@ function CreateOneRow(mt) {
     const upButton = document.createElement("BUTTON");
     upButton.innerText = "↑";
     if(MassTimesUpdates.indexOf(MassTimesUpdates.filter(m => m.ID === mt.ID)[0]) === 0) {
-        upButton.setAttribute("disabled", undefined);
+        upButton.setAttribute("disabled", "");
     }
     upButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -297,7 +327,7 @@ function CreateOneRow(mt) {
     const downButton = document.createElement("BUTTON");
     downButton.innerText = "↓";
     if(MassTimesUpdates.indexOf(MassTimesUpdates.filter(m => m.ID === mt.ID)[0]) === MassTimes.length - 1) { //Must use MassTimes.length since we are constructing MassTimesUpdates as we go
-        downButton.setAttribute("disabled", undefined);
+        downButton.setAttribute("disabled", "");
     }
     downButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -322,7 +352,7 @@ function CreateOneRow(mt) {
     frequencyDropdown.classList.add("ms-frequency");
     const frequencyPlaceholder = document.createElement("OPTION");
     frequencyPlaceholder.innerText = "Select Mass frequency";
-    frequencyPlaceholder.setAttribute("disabled", undefined);
+    frequencyPlaceholder.setAttribute("disabled", "");
     frequencyPlaceholder.style.display = "none";
     frequencyPlaceholder.value = "-1";
     frequencyDropdown.appendChild(frequencyPlaceholder);
@@ -334,7 +364,7 @@ function CreateOneRow(mt) {
     dayDropdown.classList.add("ms-day-of-week");
     const dayPlaceholder = document.createElement("OPTION");
     dayPlaceholder.innerText = "Select a day...";
-    dayPlaceholder.setAttribute("disabled", undefined);
+    dayPlaceholder.setAttribute("disabled", "");
     dayPlaceholder.setAttribute("selected", undefined);
     dayPlaceholder.style.display = "none";
     dayPlaceholder.value = "-1";
@@ -369,19 +399,22 @@ function CreateOneRow(mt) {
     });
 
     time.appendChild(frequencyDropdown);
-    
+
     const spanOn = document.createElement("SPAN");
     spanOn.innerText = " on ";
+    spanOn.classList.add("ms-time");
     time.appendChild(spanOn);
-    
     time.appendChild(dayDropdown);
     time.appendChild(datePicker);
 
     const spanAt = document.createElement("SPAN");
     spanAt.innerText = " at ";
+    spanAt.classList.add("ms-time");
     time.appendChild(spanAt);
-    
     time.appendChild(timePicker);
+
+    //Initialize to show the right form fields
+    HandleDayOfWeekDateHiding(frequencyDropdown.value, "#" + row.id);
 
     row.appendChild(time);
     
@@ -445,7 +478,6 @@ function SwapWithAdjacentElement(ID, offset) {
     ];
 
     for(var i = 0; i < MassTimesUpdates.length; i++) {
-        console.log(i);
         MassTimesUpdates[i] = NewMassTimesUpdates[i];
     }
     
@@ -457,10 +489,12 @@ function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText,
     checkbox.setAttribute("type", "checkbox");
     checkbox.id = `ms-${slugForClasses}-${mt.ID}`;
     checkbox.addEventListener("change", (e) => {
-        if(e.target.checked) {
-            document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).removeAttribute("disabled");
-        } else {
-            document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", undefined);
+        if(mt.Frequency !== Frequency.RawText) {
+            if(e.target.checked) {
+                document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).removeAttribute("disabled");
+            } else {
+                document.querySelector(`#ms-row-${mt.ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", "");
+            }
         }
     });
     if(mt[fieldName] !== undefined && !(fieldName.includes("Until") && new Date(mt[fieldName]) < Date.now())) {
@@ -481,7 +515,7 @@ function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText,
     parent.appendChild(label);
     const lengthDropdown = document.createElement("SELECT");
     lengthDropdown.classList = `ms-${slugForClasses}-dropdown`;
-    lengthDropdown.setAttribute("disabled", undefined);
+    lengthDropdown.setAttribute("disabled", "");
     const optionOne = document.createElement("OPTION");
     optionOne.innerText = firstDropdownText;
     optionOne.value = "-1";
@@ -522,7 +556,7 @@ function ResetCheckboxState(ID, slugForClasses) {
     if(document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}`).checked) {
         document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}`).checked = false;
         document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}-dropdown`).value = "-1";
-        document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", undefined);
+        document.querySelector(`#ms-row-${ID} .ms-${slugForClasses}-dropdown`).setAttribute("disabled", "");
     }
 }
 
@@ -568,12 +602,13 @@ function SaveAddMassTime(e) {
 // - No 2 mass times at the same exact time (regardless of frequency, so you'll need to calculate)
 //   - Unless one of those 2 masses are either cancelled or deleted
 function ValidateNewMassTimesObject(ID) {
-    const selectorPrefix = ID ? `#ms-row-${ID} .` : "#";
-    const frequencyField = document.querySelector(selectorPrefix + "ms-frequency");
-    const dayField = document.querySelector(selectorPrefix + "ms-day-of-week");
-    const dateField = document.querySelector(selectorPrefix + "ms-date");
-    const timeField = document.querySelector(selectorPrefix + "ms-time");
-    const notesField = document.querySelector(selectorPrefix + "ms-additional-notes");
+    const selectorPrefixInput = ID ? `#ms-row-${ID} input.` : "input#";
+    const selectorPrefixSelect = ID ? `#ms-row-${ID} select.` : "select#";
+    const frequencyField = document.querySelector(selectorPrefixSelect + "ms-frequency");
+    const dayField = document.querySelector(selectorPrefixSelect + "ms-day-of-week");
+    const dateField = document.querySelector(selectorPrefixInput + "ms-date");
+    const timeField = document.querySelector(selectorPrefixInput + "ms-time");
+    const notesField = document.querySelector(selectorPrefixInput + "ms-additional-notes");
 
     const allFields = [ frequencyField, dayField, dateField, timeField, notesField ];
     allFields.forEach(f => f.setCustomValidity("")); //reset validation
@@ -606,7 +641,7 @@ function ValidateNewMassTimesObject(ID) {
     if(frequencyField.value === Frequency.OneTime && dateField.value === "") {
         dateField.setCustomValidity("Plase select a date");
     }
-    if(timeField.value === "") {
+    if(frequencyField.value !== Frequency.RawText && timeField.value === "") {
         timeField.setCustomValidity("Plase select a time");
     }
 
