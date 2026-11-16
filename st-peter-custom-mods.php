@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: St. Peter Custom Mods
-Version: 1.0.1 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
+Version: 1.0.2 | Author: Jeffrey Gaydos | Github Repo: https://github.com/JeffreyGaydos/st-peter-custom-mods
 
 Description: A plugin created for St. Peter Parish for any and all customizations that could be easily implemented in a plugin
 */
@@ -101,11 +101,14 @@ if( !function_exists("spc_acp_page") ) {
                     <input type="date" id="ms-date" class="ms-date" disabled>
                     <br/>
                     <label for="ms-time">Time of Day</label>
-                    <input type="time" id="ms-time" disabled>
+                    <input type="time" id="ms-time" class="ms-time" disabled>
                     <br/>
                     <label for="ms-additional-notes">Additional Notes</label>
                     <input type="text" id="ms-additional-notes" disabled/>
                     <span style="font-style: italic">(HTML code Supported)</span>
+                    <br/>
+                    <label for="ms-list">Display in bulletted list</label>
+                    <input type="checkbox" id="ms-list" checked/>
                     <br/>
                     <br/>
                     <input type="submit" id="ms-add-button" class="button button-primary" value="Add this Mass Time" disabled />
@@ -133,6 +136,7 @@ if( !function_exists("spc_acp_page") ) {
                                 <th>Cancel</th>
                                 <th>Additional Notes</th>
                                 <th>Delete</th>
+                                <th>Display Bulleted</th>
                                 <th>Is Actually Saved</th>
                             </tr>
                         </thead>
@@ -145,7 +149,6 @@ if( !function_exists("spc_acp_page") ) {
                 <div>
                     <h3>Mass Times Preview:</h3>
                     <div id="ms-preview-window">
-                        <h3>Mass Times:</h3>
                         <spc_mass_times></spc_mass_times>
                     </div>
                 </div>

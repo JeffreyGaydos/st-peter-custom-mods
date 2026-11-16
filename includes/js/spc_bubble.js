@@ -64,10 +64,7 @@
         contentFlex.classList.add("spc-two-column-parent");
         var contentLeft = document.createElement("DIV");
         contentLeft.classList.add("spc-two-column-child");
-        var contentLeftTitle = document.createElement("H3");
-        contentLeftTitle.innerText = "Mass Schedule";
         var massTimesElement = document.createElement("spc_mass_times");
-        contentLeft.appendChild(contentLeftTitle);
         contentLeft.appendChild(massTimesElement);
         var contentRight = document.createElement("DIV");
         contentRight.classList.add("spc-two-column-child");
@@ -90,6 +87,13 @@
         contentRightLink.appendChild(contentRightImage);
         contentRight.appendChild(contentRightLink);
         contentRight.appendChild(contentRightHint);
+
+        var calendarLink = document.createElement("A");
+        calendarLink.href = "https://www.stpetercleveland.org/calendar/";
+        calendarLink.innerText = "For more details, see the Parish Calendar";
+        calendarLink.style.marginBottom = "20px";
+        calendarLink.style.display = "inline-block";
+        contentLeft.appendChild(calendarLink);
 
         content.appendChild(contentTitle);
         contentFlex.appendChild(contentLeft);

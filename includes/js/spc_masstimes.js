@@ -1,7 +1,8 @@
 const Frequency = {
     Weekly: "Weekly",
-    OneTime: "One Time"
-}
+    OneTime: "One Time",
+    RawText: "Raw Text"
+};
 
 //Used by the Admin Pannel as well to update the preview in real-time
 function RenderPreview(json) {
@@ -10,26 +11,49 @@ function RenderPreview(json) {
     allPreviews.forEach((preview) => {
         preview.innerHTML = ""; //clear any previous render
         if(purgedJson.length > 0) {
-            const listP = document.createElement("UL");
+            let previousListVal = false;
+            var listP = undefined;
             for(var i = 0; i < purgedJson.length; i++) {
-                const listE = document.createElement("LI");
-                const niceDate = purgedJson[i].Frequency === Frequency.OneTime ? new Date(purgedJson[i].Date).toLocaleDateString("en", {
+                if((purgedJson[i].List === true || purgedJson[i].List === undefined) && !previousListVal) {
+                    listP = document.createElement("UL");
+                } else if(purgedJson[i].List === false) {
+                    if(listP) {
+                        preview.appendChild(listP);
+                        listP = undefined; //We are no longer inside a UL element
+                    }
+                }
+                const listE = purgedJson[i].List === false ? document.createElement("P") : document.createElement("LI");
+                // Adding a time component to avoid time-zone conversions resulting in next or previous day issues
+                const niceDate = purgedJson[i].Frequency === Frequency.OneTime ? new Date(purgedJson[i].Date + " 12:00:00").toLocaleDateString("en", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
                     day: "numeric"
                 }) : undefined;
-                const frequencyDay = purgedJson[i].Frequency === Frequency.Weekly ? `Every ${purgedJson[i].Day}` : `${niceDate}`
-                const timeString = purgedJson[i].Time.split(":")[0] > 12 ? `${purgedJson[i].Time.split(":")[0] - 12}:${purgedJson[i].Time.split(":")[1]} PM` : `${purgedJson[i].Time} AM`
+                const frequencyDay = purgedJson[i].Frequency === Frequency.Weekly ? `Every ${purgedJson[i].Day}` : `${niceDate}`;
+                const timeString = new Date(`2000-01-01 ${purgedJson[i].Time}`).toLocaleTimeString({ hour: "short" }).replace(/:00 (?=[AP]M)/, " ");
                 const isCancelled = purgedJson[i].CancelledUntil ? new Date() < new Date(new Date(purgedJson[i].CancelledUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].CancelledUntil === null;
                 const isDeleted = purgedJson[i].DeletedUntil ? new Date() < new Date(new Date(purgedJson[i].DeletedUntil).toISOString().split("T")[0] + "T23:59:59") : purgedJson[i].DeletedUntil === null;
                 const cancelStartString = isCancelled ? '<span style="text-decoration: line-through">' : '';
                 const cancelEndString = isCancelled ? '</span><span style="font-weight: 600; color: red"> CANCELLED</span>' : '';
-                listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`
-                if(!isDeleted)
-                    listP.appendChild(listE);
+                if(purgedJson[i].Frequency === Frequency.RawText) {
+                    listE.innerHTML = `${purgedJson[i].AdditionalNotes}`;
+                } else {
+                    listE.innerHTML = `${cancelStartString}${frequencyDay} at ${timeString}${cancelEndString}${purgedJson[i].AdditionalNotes}`;
+                }
+                if(!isDeleted) {
+                    if(purgedJson[i].List === false) {
+                        preview.appendChild(listE);
+                    } else {
+                        listP.appendChild(listE);
+                    }
+                }
+
+                previousListVal = purgedJson[i].List ?? true;
             }
-            preview.appendChild(listP);
+            if(purgedJson[purgedJson.length - 1].List !== false) {
+                preview.appendChild(listP);
+            }
         }
     });
 }
