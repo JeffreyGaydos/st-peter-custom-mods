@@ -33,6 +33,7 @@ const DayArray = [
 //         CancelleddUntil: undefined, //The UI does this by occurance, but we should calculate the moment that future occurance happens so we don't have to store when the user clicked buttons
 //         DeletedUntil: undefined,
 //         AdditionalNotes: "Only 1 door will be unlocked, etc."
+//         List: true //False is used for raw text representing a header of some sort, undefined will result in false
 //     },
 //     {
 //         ID: Date.now(),
@@ -43,6 +44,7 @@ const DayArray = [
 //         CancelleddUntil: '2026-05-04T00:00:00.000Z', // Note: timezones!
 //         DeletedUntil: undefined,
 //         AdditionalNotes: "Only 1 door will be unlocked, etc."
+//         List: undefined
 //     },
 //     {
 //         ID: Date.now(),
@@ -53,6 +55,7 @@ const DayArray = [
 //         CancelleddUntil: undefined, //The UI does this by occurance, but we should calculate the moment that future occurance happens so we don't have to store when the user clicked buttons
 //         DeletedUntil: undefined,
 //         AdditionalNotes: "Chrism Mass at <a href='#google-maps' >St. Sebastian Church, 476 Mull Ave., Akron</a>"
+//         List: false
 //     }
 // ];
 
@@ -69,14 +72,19 @@ function LoadRawJson() {
 function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
     const dayOfWeekClass = "ms-day-of-week";
     const dateClass = "ms-date";
+    const timeID = "ms-time";
     const dayOfWeekSelector = `${commonAncestorSelector} .${dayOfWeekClass}, ${commonAncestorSelector} [for='${dayOfWeekClass}']`;
     const dateSelector = `${commonAncestorSelector} .${dateClass}, ${commonAncestorSelector} [for='${dateClass}']`;
+    const timeSelector = `${commonAncestorSelector} #${timeID}, ${commonAncestorSelector} [for='${timeID}']`;
     if(selectedFrequency === Frequency.Weekly) {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
             e.style.display = "inline-block";
         });
         document.querySelectorAll(dateSelector).forEach(e => {
             e.style.display = "none";
+        });
+        document.querySelectorAll(timeSelector).forEach(e => {
+            e.style.display = "inline-block";
         });
     } else if(selectedFrequency === Frequency.OneTime) {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
@@ -85,11 +93,27 @@ function HandleDayOfWeekDateHiding(selectedFrequency, commonAncestorSelector) {
         document.querySelectorAll(dateSelector).forEach(e => {
             e.style.display = "inline-block";
         });
+        document.querySelectorAll(timeSelector).forEach(e => {
+            e.style.display = "inline-block";
+        });
+    } else if(selectedFrequency == Frequency.RawText) {
+        document.querySelectorAll(dayOfWeekSelector).forEach(e => {
+            e.style.display = "none";
+        });
+        document.querySelectorAll(dateSelector).forEach(e => {
+            e.style.display = "none";
+        });
+        document.querySelectorAll(timeSelector).forEach(e => {
+            e.style.display = "none";
+        });
     } else {
         document.querySelectorAll(dayOfWeekSelector).forEach(e => {
             e.style.display = "none";
         });
         document.querySelectorAll(dateSelector).forEach(e => {
+            e.style.display = "none";
+        });
+        document.querySelectorAll(timeSelector).forEach(e => {
             e.style.display = "none";
         });
     }
@@ -140,6 +164,7 @@ function InitializeAddMassTimeForm() {
             AdditionalNotes: document.querySelector("#ms-additional-notes").value,
             CancelleddUntil: undefined,
             DeletedUntil: undefined,
+            List: document.querySelector("#ms-list").checked
         };
 
         const rawJson = document.querySelector("#ms-json-add").value;
@@ -168,7 +193,8 @@ function InitializeEditMassTimeFormTable() {
             Time: m.Time,
             AdditionalNotes: m.AdditionalNotes,
             CancelledUntil: m.CancelledUntil,
-            DeletedUntil: m.DeletedUntil
+            DeletedUntil: m.DeletedUntil,
+            List: m.List
         });
         parent.appendChild(CreateOneRow(m));
         HandleDayOfWeekDateHiding(m.Frequency, "#ms-row-" + m.ID);
@@ -240,7 +266,8 @@ function AnyDifferencesOnThisRow(ID) {
         || o.Time !== u.Time
         || o.AdditionalNotes !== u.AdditionalNotes
         || o.CancelledUntil !== u.CancelledUntil
-        || o.DeletedUntil !== u.DeletedUntil;
+        || o.DeletedUntil !== u.DeletedUntil
+        || (o.List ?? true) !== (u.List ?? true);
 }
 
 function CreateOneRow(mt) {
@@ -266,7 +293,6 @@ function CreateOneRow(mt) {
             UpdateIsSavedIndicator(mtu.ID);
             RenderPreview(MassTimesUpdates);
         });
-        
     });
     const downButton = document.createElement("BUTTON");
     downButton.innerText = "↓";
@@ -379,6 +405,21 @@ function CreateOneRow(mt) {
 
     row.appendChild(_delete);
 
+    const bulletedDisplay = document.createElement("TD");
+    const bulletedCheckbox = document.createElement("INPUT");
+    bulletedCheckbox.setAttribute("type", "checkbox");
+    bulletedCheckbox.id = `ms-bulleted-${mt.ID}`;
+    if(mt.List ?? true) {
+        bulletedCheckbox.setAttribute("checked", undefined);
+    }
+    const bulletedLabel = document.createElement("LABEL");
+    bulletedLabel.innerText = "Bulletted";
+    bulletedLabel.setAttribute("for", bulletedCheckbox.id);
+    AddSaveFieldEventListener(bulletedCheckbox, "List", () => bulletedCheckbox.checked, mt.ID);
+    bulletedDisplay.appendChild(bulletedCheckbox);
+    bulletedDisplay.appendChild(bulletedLabel);
+    row.appendChild(bulletedDisplay);
+
     const saveState = document.createElement("TD");
     saveState.id = `ms-save-state-${mt.ID}`;
     saveState.classList.add("s");
@@ -395,16 +436,19 @@ function SwapWithAdjacentElement(ID, offset) {
     const me = MassTimesUpdates[thisIndex];
     const swap = MassTimesUpdates[thisIndex - (offset === 1 ? 1 : -1)];
     const before = [...MassTimesUpdates.slice(0, thisIndex - offset)];
-    const after = [...MassTimesUpdates.slice(thisIndex + 1 - (offset === 1 ? 1 : -1), MassTimesUpdates.length)];
-    NewMassTimesUpdates = [
+    const after = [...MassTimesUpdates.slice(thisIndex + 1 - (offset === 1 ? 0 : -1), MassTimesUpdates.length)];
+    const NewMassTimesUpdates = [
         ...before,
         offset === 1 ? me : swap,
         offset === 1 ? swap : me,
         ...after
-    ]
+    ];
+
     for(var i = 0; i < MassTimesUpdates.length; i++) {
-        MassTimesUpdates[i] = NewMassTimesUpdates[i]
+        console.log(i);
+        MassTimesUpdates[i] = NewMassTimesUpdates[i];
     }
+    
 }
 
 function GenerateCheckboxLabelAndDropdown(parent, mt, slugForClasses, labelText, fieldName, firstDropdownText, numOtherOptions, jsonField, frequencyDropdown) {

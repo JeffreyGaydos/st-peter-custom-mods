@@ -107,6 +107,9 @@ if( !function_exists("spc_acp_page") ) {
                     <input type="text" id="ms-additional-notes" disabled/>
                     <span style="font-style: italic">(HTML code Supported)</span>
                     <br/>
+                    <label for="ms-list">Display in bulletted list</label>
+                    <input type="checkbox" id="ms-list" checked/>
+                    <br/>
                     <br/>
                     <input type="submit" id="ms-add-button" class="button button-primary" value="Add this Mass Time" disabled />
                 </fieldset>
@@ -133,6 +136,7 @@ if( !function_exists("spc_acp_page") ) {
                                 <th>Cancel</th>
                                 <th>Additional Notes</th>
                                 <th>Delete</th>
+                                <th>Display Bulleted</th>
                                 <th>Is Actually Saved</th>
                             </tr>
                         </thead>
