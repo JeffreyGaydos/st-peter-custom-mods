@@ -88,6 +88,13 @@
         contentRight.appendChild(contentRightLink);
         contentRight.appendChild(contentRightHint);
 
+        var calendarLink = document.createElement("A");
+        calendarLink.href = "https://www.stpetercleveland.org/calendar/";
+        calendarLink.innerText = "For more details, see the Parish Calendar";
+        calendarLink.style.marginBottom = "20px";
+        calendarLink.style.display = "inline-block";
+        contentLeft.appendChild(calendarLink);
+
         content.appendChild(contentTitle);
         contentFlex.appendChild(contentLeft);
         contentFlex.appendChild(contentRight);
