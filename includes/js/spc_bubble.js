@@ -64,10 +64,7 @@
         contentFlex.classList.add("spc-two-column-parent");
         var contentLeft = document.createElement("DIV");
         contentLeft.classList.add("spc-two-column-child");
-        var contentLeftTitle = document.createElement("H3");
-        contentLeftTitle.innerText = "Mass Schedule";
         var massTimesElement = document.createElement("spc_mass_times");
-        contentLeft.appendChild(contentLeftTitle);
         contentLeft.appendChild(massTimesElement);
         var contentRight = document.createElement("DIV");
         contentRight.classList.add("spc-two-column-child");
